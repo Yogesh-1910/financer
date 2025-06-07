@@ -1,0 +1,85 @@
+/* src/components/Layout/Navbar.module.css */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  height: var(--header-height); /* Use CSS variable */
+  background-color: var(--background-color); /* White header */
+  color: var(--text-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Softer shadow */
+  position: sticky; /* Make it sticky if you want, or fixed */
+  top: 0;
+  z-index: 1010; /* Highest z-index */
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+}
+
+.menuButton {
+  font-size: 1.5rem;
+  color: var(--text-color) !important; /* Override button text variant color */
+  margin-right: 15px;
+  background: none !important;
+  padding: 8px !important;
+  border-radius: 50%;
+}
+.menuButton:hover {
+  background-color: rgba(0,0,0,0.05) !important;
+}
+
+.appLogo {
+    height: 30px; /* Adjust if you add a logo */
+    margin-right: 10px;
+}
+
+.brand {
+  font-size: 1.7rem;
+  font-weight: 700; /* Bolder */
+  color: var(--primary-color); /* Use primary color for brand */
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+}
+
+.profileLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-color);
+  padding: 6px 12px;
+  border-radius: 25px; /* Pill shape */
+  transition: background-color 0.2s ease;
+}
+.profileLink:hover {
+  background-color: #e9ecef; /* Light hover for profile link */
+}
+
+.usernameNav {
+  margin-right: 10px; /* Username before avatar */
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 15px;
+  }
+  .usernameNav {
+    display: none;
+  }
+  .profileLink {
+    padding: 5px; /* Just avatar */
+  }
+  .brand {
+    font-size: 1.4rem;
+  }
+}

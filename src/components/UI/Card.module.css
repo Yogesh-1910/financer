@@ -1,0 +1,36 @@
+.card {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px 25px; /* Increased padding */
+  margin-bottom: 25px; /* Increased margin */
+  overflow: hidden; /* For tables inside */
+  border: 1px solid #e0e0e0; /* Subtle border */
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px; /* Increased spacing */
+  padding-bottom: 15px; /* Increased spacing */
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.cardTitle {
+  margin-top: 0;
+  margin-bottom: 0; /* Removed margin as spacing handled by header */
+  font-size: 1.4rem; /* Slightly reduced */
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.cardActions {
+  display: flex;
+  gap: 10px;
+}
+
+.cardContent {
+  font-size: 1rem;
+  color: var(--text-color);
+}

@@ -1,0 +1,48 @@
+.inputGroup {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: var(--text-color);
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.input {
+  width: 100%; /* Changed to 100% to use box-sizing */
+  padding: 10px;
+  border: 1px solid var(--medium-gray);
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box; /* Important for width calculation */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.input:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+.errorInput {
+  border-color: var(--danger-color);
+}
+.errorInput:focus {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+}
+
+.errorMessage {
+  color: var(--danger-color);
+  font-size: 0.8rem;
+  margin-top: 3px;
+  text-align: left;
+}

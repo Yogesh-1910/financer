@@ -1,0 +1,39 @@
+/* src/App.css */
+.App {
+  text-align: center; /* Or remove if not needed globally */
+}
+
+.dashboard-layout-wrapper {
+  display: flex;
+  flex-direction: column; /* Navbar on top, then content area */
+  min-height: 100vh;
+}
+
+.app-container { /* This will contain Sidebar and Main Content */
+  display: flex;
+  flex-grow: 1; /* Takes remaining height after Navbar */
+  /* The Navbar's height is fixed, so app-container starts below it */
+  /* margin-top: var(--header-height); No, Navbar is part of flex column now */
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 25px 30px; /* Generous padding */
+  margin-left: 260px; /* Default margin for when sidebar is open (matches sidebar width) */
+  transition: margin-left 0.3s ease-in-out;
+  background-color: var(--content-background);
+  overflow-y: auto; /* Allow content to scroll */
+  height: calc(100vh - var(--header-height)); /* Full height minus header */
+}
+
+.main-content.sidebar-collapsed {
+  margin-left: 70px; /* Margin when sidebar is collapsed to a smaller icon-only width */
+}
+
+@media (max-width: 992px) { /* Tablet and smaller */
+  .main-content,
+  .main-content.sidebar-collapsed { /* On smaller screens, sidebar overlays or pushes content differently */
+    margin-left: 0; /* Sidebar will overlay or be hidden */
+    padding: 20px;
+  }
+}

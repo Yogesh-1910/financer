@@ -1,0 +1,16 @@
+.avatarImage, .avatarInitials {
+  border-radius: 50%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.avatarInitials {
+  /* Background color is set dynamically */
+  text-transform: uppercase;
+}

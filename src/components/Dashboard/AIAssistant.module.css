@@ -1,0 +1,115 @@
+.aiAssistantCard {
+  display: flex;
+  flex-direction: column;
+  height: 75vh;
+  max-height: 700px; /* Max height */
+  min-height: 400px; /* Min height */
+}
+
+.chatWindow {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px;
+  border: 1px solid var(--light-gray);
+  border-radius: 8px;
+  margin-bottom: 15px;
+  background-color: #f4f7f9; /* Lighter background */
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between bubbles */
+}
+
+.messageBubble {
+  padding: 10px 15px;
+  border-radius: 18px; /* More bubbly */
+  max-width: 75%; /* Max width of bubble */
+  word-wrap: break-word;
+  line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.messageBubble p {
+  margin: 0;
+}
+
+.user {
+  background-color: var(--secondary-color);
+  color: white;
+  margin-left: auto; /* Align to right */
+  border-bottom-right-radius: 5px; /* Flat edge */
+}
+
+.ai {
+  background-color: #e9ecef; /* Softer AI bubble */
+  color: var(--text-color);
+  margin-right: auto; /* Align to left */
+  border-bottom-left-radius: 5px; /* Flat edge */
+}
+
+.inputArea {
+  display: flex;
+  gap: 10px;
+  align-items: center; /* Align items vertically */
+}
+
+.inputArea > div { /* Target Input component's wrapper */
+  flex-grow: 1;
+  margin-bottom: 0;
+}
+.inputArea input { /* Style the actual input element */
+  padding-right: 45px; /* Space for an potential inner button or icon */
+}
+
+.sendButton, .voiceButton {
+  padding: 0; /* Remove padding for icon buttons */
+  width: 42px; /* Square button */
+  height: 42px; /* Square button */
+  font-size: 1.5rem; /* Icon size */
+  line-height: 42px; /* Center icon vertically */
+  border-radius: 50%; /* Circular */
+  flex-shrink: 0; /* Prevent shrinking */
+}
+.voiceButton {
+    position: relative; /* For pulse animation */
+}
+
+.listeningPulse {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+@keyframes pulse {
+    0% { transform: scale(0.8); opacity: 0.7; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.8); opacity: 0.7; }
+}
+
+
+.voiceErrorMessage {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.chatOptions {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.chatOptions input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+
+.llmNote {
+  font-size: 0.8rem;
+  color: var(--dark-gray);
+  margin-top: 15px;
+  text-align: center;
+}

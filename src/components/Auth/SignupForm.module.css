@@ -1,0 +1,51 @@
+/* Using LoginForm styles as a base and overriding if needed */
+@import './LoginForm.module.css'; /* This is not standard CSS import, but shows intent. Apply similar styles. */
+
+/* For demonstration, let's copy relevant styles and adjust */
+.signupFormContainer {
+  max-width: 450px; /* Slightly wider for more fields */
+  margin: 30px auto;
+  padding: 30px 35px;
+  background-color: var(--background-color);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.signupFormContainer h2 {
+  color: var(--primary-color);
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+.errorMessage { /* Copied from LoginForm.module.css */
+  color: var(--danger-color);
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  font-size: 0.9rem;
+}
+
+.signupButton { /* Copied from LoginForm.module.css */
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 20px;
+}
+
+.loginPrompt { /* Copied from LoginForm.module.css */
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.loginPrompt a { /* Copied from LoginForm.module.css */
+  color: var(--secondary-color);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.loginPrompt a:hover { /* Copied from LoginForm.module.css */
+  text-decoration: underline;
+}

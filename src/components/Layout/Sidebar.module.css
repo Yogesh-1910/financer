@@ -1,0 +1,195 @@
+/* src/components/Layout/Sidebar.module.css */
+
+.sidebar {
+  width: 260px; /* Default open width */
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  position: fixed; /* Fixed position */
+  top: var(--header-height); /* Starts below the header */
+  left: 0;
+  bottom: 0;
+  z-index: 1000; /* Below Navbar, above content overlay if any */
+  transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1); /* Softer shadow */
+  overflow-x: hidden; /* Hide horizontal overflow during transition */
+}
+
+/* Collapsed state for desktop */
+.sidebar.closed {
+  width: 70px; /* Icon-only width */
+}
+.sidebar.closed .label {
+  display: none; /* Hide text labels */
+}
+.sidebar.closed .navLink,
+.sidebar.closed .logoutButtonSidebar {
+  justify-content: center; /* Center icons */
+}
+.sidebar.closed .icon {
+  margin-right: 0;
+  font-size: 1.4rem; /* Slightly larger icons when collapsed */
+}
+.sidebar.closed .sidebarHeader {
+  height: 10px; /* Maintain consistent small spacer height when collapsed */
+  padding: 0;
+  /* border-bottom: none; if no content and no border needed */
+}
+.sidebar.closed .sidebarAppLogo { /* If you have a logo that changes when collapsed */
+  display: none; /* Hide logo text in collapsed state if it was text, or style a smaller icon logo */
+}
+
+
+/* Mobile behavior: Overlay */
+@media (max-width: 992px) {
+  .sidebar {
+    transform: translateX(-100%); /* Hidden by default */
+    width: 260px; /* Full width when open on mobile */
+    top: 0; /* Overlay from the very top on mobile */
+    height: 100vh;
+    z-index: 1005; /* Higher than backdrop, lower than navbar */
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  /* In mobile view, always show labels if open */
+  .sidebar.open .label {
+    display: block; /* Or flex if needed */
+  }
+  .sidebar.open .navLink,
+  .sidebar.open .logoutButtonSidebar {
+    justify-content: flex-start; /* Align items to start */
+  }
+  .sidebar.open .icon {
+    margin-right: 15px; /* Restore margin for icon */
+    font-size: 1.2rem; /* Restore icon size */
+  }
+  .sidebar.open .sidebarHeader {
+    /* Ensure space for the main app header when sidebar overlays on mobile */
+    padding-top: calc(var(--header-height) + 5px); /* Small space below the app header */
+    height: auto; /* Let padding define height on mobile header */
+    border-bottom: none; /* No border needed if it's just a spacer on mobile */
+  }
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.4);
+  z-index: 1001; /* Below sidebar, above content */
+}
+
+
+.sidebarHeader {
+  height: 10px; /* Minimal height to act as a top spacer for nav items */
+  padding: 0; /* No internal padding */
+  border-bottom: none; /* No border if it's just an empty spacer */
+  display: flex; /* Kept for potential future use like a tiny logo/indicator */
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebarAppLogo { /* Style for an optional logo in the header when sidebar is open */
+  /* Example styles if you were to add a logo:
+    max-height: 30px;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  */
+}
+/* If sidebar is collapsed and you have a logo, you might hide or change it */
+/* .sidebar.closed .sidebarAppLogo { opacity: 0; } */
+
+
+.sidebarNav {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-top: 0; /* Nav items start right after the minimal sidebarHeader */
+}
+.sidebarNav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, border-left-color 0.2s ease;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  border-left: 4px solid transparent; /* Indicator space */
+  font-weight: 400; /* Regular weight */
+}
+
+.navLink:hover {
+  background-color: rgba(255,255,255,0.05);
+  color: var(--sidebar-text-hover);
+}
+
+.navLink.active {
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-text-hover);
+  font-weight: 500; /* Medium weight for active */
+  border-left-color: var(--sidebar-active-indicator);
+}
+.navLink.active .icon {
+  color: var(--sidebar-active-indicator); /* Make icon match indicator color */
+}
+
+.icon {
+  font-size: 1.2rem;
+  margin-right: 15px;
+  min-width: 24px; /* Ensure consistent icon spacing */
+  text-align: center;
+  transition: transform 0.2s ease;
+  color: var(--sidebar-text); /* Default icon color */
+}
+.navLink:hover .icon {
+  transform: scale(1.05);
+}
+
+.label {
+  font-size: 0.9rem; /* Consistent label size */
+}
+
+.sidebarFooter {
+  padding: 15px 0px; /* Padding around the button itself */
+  border-top: 1px solid rgba(255,255,255,0.08); /* Softer border */
+  margin: 0 15px; /* Margin for the footer container */
+}
+.logoutButtonSidebar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px; /* Match navLink padding when open */
+  font-size: 0.9rem;
+  background-color: transparent;
+  color: var(--sidebar-text);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.logoutButtonSidebar:hover {
+  background-color: rgba(220,53,69,0.15); /* Danger color tint on hover */
+  color: var(--danger-color);
+}
+.logoutButtonSidebar .icon {
+    margin-right: 15px; /* Ensure consistent icon spacing */
+}
+.logoutButtonSidebar:hover .icon {
+    color: var(--danger-color);
+}
+
+/* When sidebar is collapsed, logout button also centers its icon */
+.sidebar.closed .logoutButtonSidebar .icon {
+    margin-right: 0;
+}

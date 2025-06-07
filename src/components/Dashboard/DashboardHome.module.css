@@ -1,0 +1,218 @@
+/* src/components/Dashboard/DashboardHome.module.css */
+
+.dashboardHomeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 30px; /* Increased gap between cards */
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: 1.2rem;
+  color: var(--dark-gray);
+}
+
+/* User Details Card Styling */
+.userDetailsCard {
+  /* The Card component itself provides base styling like padding and shadow */
+  /* We are styling the content within the card */
+}
+
+.profileHeader {
+  display: flex;
+  flex-direction: column; /* Stack avatar, text, button on small screens */
+  align-items: center;
+  text-align: center;
+  margin-bottom: 25px; /* Space below header section before details grid */
+  padding-bottom: 20px; /* Space before potential border */
+  border-bottom: 1px solid var(--border-color); /* Separator line */
+}
+
+.profileHeaderText {
+  margin-top: 15px; /* Space between avatar and text */
+  margin-bottom: 20px; /* Space between text and button */
+}
+
+.userName {
+  margin-top: 0; /* Reset from avatar margin */
+  margin-bottom: 5px;
+  font-size: 1.8rem; /* Larger username */
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.userGreeting { /* Replaces occupation display */
+  margin-top: 0;
+  font-size: 1rem;
+  color: var(--text-light);
+}
+
+.editProfileButtonLink button { /* Style the button within the link */
+  /* Button component styles will apply; can add specifics if needed */
+  padding: 8px 25px; /* Adjust button padding */
+}
+
+.profileDetailsGrid {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column for details on small screens */
+  gap: 15px; /* Gap between detail items */
+}
+
+.detailItem {
+  background-color: #f8f9fa; /* Very light background for each detail item */
+  padding: 12px 18px; /* Generous padding */
+  border-radius: 6px;
+  border: 1px solid #eef2f5; /* Softer border than main card border */
+  display: flex;
+  flex-direction: column; /* Stack label and value by default */
+}
+
+.detailLabel {
+  font-weight: 500; /* Slightly less bold */
+  color: var(--secondary-color);
+  margin-bottom: 4px;
+  font-size: 0.8rem; /* Smaller label */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detailValue {
+  color: var(--text-color);
+  font-size: 1rem; /* Clear value text */
+  font-weight: 400;
+  word-break: break-word;
+}
+
+/* Responsive adjustments for medium screens and up */
+@media (min-width: 768px) {
+  .profileHeader {
+    flex-direction: row; /* Avatar, text, button side-by-side */
+    text-align: left;
+    align-items: center; /* Vertically align items in the header */
+  }
+  .profileHeaderText {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 20px; /* Space between avatar and text */
+    flex-grow: 1; /* Allow text to take available space */
+  }
+  .editProfileButtonLink {
+    margin-left: auto; /* Push button to the right */
+    flex-shrink: 0; /* Prevent button from shrinking */
+  }
+
+  .profileDetailsGrid {
+    grid-template-columns: repeat(2, 1fr); /* Two columns for details */
+    gap: 18px 25px; /* row-gap column-gap */
+  }
+  /* If you want some items to span full width in the 2-column grid:
+  .detailItem.full-width {
+    grid-column: 1 / -1;
+  }
+  */
+}
+
+
+/* --- News Card Styling (remains largely the same from previous version) --- */
+.newsCard {
+  /* ... */
+}
+
+.newsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 550px;
+  overflow-y: auto;
+}
+
+.newsItem {
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+.newsItem:hover {
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+.newsItem:last-child {
+  margin-bottom: 0;
+}
+
+.newsLink {
+  text-decoration: none;
+  color: var(--text-color);
+  display: block;
+}
+.newsLink:hover .newsTitle {
+  color: var(--primary-color);
+}
+
+.newsTitle {
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.newsMeta {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  align-items: center;
+}
+.newsSource {
+  font-weight: 500;
+  color: var(--secondary-color);
+}
+.newsDate { /* No specific style needed */ }
+
+.newsDescription {
+  font-size: 0.875rem;
+  color: var(--text-color);
+  line-height: 1.5;
+  margin-top: 5px;
+}
+
+.loadingText, .errorText {
+  text-align: center;
+  padding: 25px 20px;
+  font-size: 0.95rem;
+  color: var(--dark-gray);
+}
+.errorText {
+  color: var(--danger-color);
+  background-color: rgba(220,53,69,0.05);
+  border: 1px solid rgba(220,53,69,0.1);
+  border-radius: 6px;
+}
+.errorText small {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.8rem;
+}
+
+.moreNewsLink {
+  display: block;
+  text-align: right;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  font-weight: bold;
+  text-decoration: none;
+}
+.moreNewsLink:hover {
+  text-decoration: underline;
+  color: var(--primary-color);
+}
