@@ -1,51 +1,74 @@
-/* Using LoginForm styles as a base and overriding if needed */
-@import './LoginForm.module.css'; /* This is not standard CSS import, but shows intent. Apply similar styles. */
+/* src/components/Auth/SignupForm.module.css */
 
-/* For demonstration, let's copy relevant styles and adjust */
 .signupFormContainer {
-  max-width: 450px; /* Slightly wider for more fields */
-  margin: 30px auto;
-  padding: 30px 35px;
-  background-color: var(--background-color);
-  border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  /* max-width is controlled by .formWrapper in AuthPage.module.css, 
+     but you can set a slightly different one here if signup needs more width.
+     For consistency, it's often good to let .formWrapper handle it.
+     max-width: 450px; 
+  */
+  padding: 30px 35px; /* Adjust padding as needed for more fields */
+  
+  /* --- TRANSLUCENT BACKGROUND --- */
+  /* Ensure --surface-color-rgb (e.g., 26, 32, 44 for #1A202C) is in index.css */
+  background-color: rgba(var(--surface-color-rgb, 26, 32, 44), 0.8); /* Dark surface with 80% opacity */
+  /* Adjust opacity (0.8) as desired. */
+
+  /* Optional: Frosted Glass Effect */
+  /* backdrop-filter: blur(5px) saturate(120%); */
+  /* -webkit-backdrop-filter: blur(5px) saturate(120%); */
+
+  color: var(--text-color, #EAEAEA); 
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6); 
   text-align: center;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(var(--border-color-dark-theme-rgb, 45, 55, 72), 0.4);
+  /* Or: border: 1px solid var(--border-color-dark-theme, #2D3748); */
+
+  position: relative; 
 }
 
-.signupFormContainer h2 {
-  color: var(--primary-color);
-  margin-bottom: 25px;
+.signupFormContainer h2 { /* "Sign Up" heading */
+  color: var(--primary-color); /* Your green */
+  margin-bottom: 20px; /* Less margin if more fields */
   font-weight: 600;
+  font-size: 1.8rem;
 }
 
-.errorMessage { /* Copied from LoginForm.module.css */
+.errorMessage {
   color: var(--danger-color);
-  background-color: rgba(220, 53, 69, 0.1);
-  padding: 10px;
-  border-radius: 4px;
+  background-color: rgba(var(--danger-rgb, 255, 82, 82), 0.2);
+  padding: 10px 12px;
+  border-radius: 6px;
   margin-bottom: 15px;
-  border: 1px solid rgba(220, 53, 69, 0.2);
+  border: 1px solid rgba(var(--danger-rgb, 255, 82, 82), 0.5);
   font-size: 0.9rem;
+  text-align: left;
 }
 
-.signupButton { /* Copied from LoginForm.module.css */
+/* Input fields inside this form are styled by UI/Input.module.css 
+   (should have opaque black background, green border, white text when active) */
+
+.signupButton { /* The main Sign Up button */
   width: 100%;
-  margin-top: 10px;
+  margin-top: 15px;
   padding: 12px 20px;
+  /* Styling (green background, white text) comes from Button.module.css */
 }
 
-.loginPrompt { /* Copied from LoginForm.module.css */
+.loginPrompt { /* "Already have an account? Login" */
   margin-top: 20px;
   font-size: 0.9rem;
+  color: var(--text-secondary-dark-theme); /* Lighter grey */
 }
 
-.loginPrompt a { /* Copied from LoginForm.module.css */
-  color: var(--secondary-color);
+.loginPrompt a { /* "Login" link */
+  color: var(--secondary-color-dark-theme, var(--primary-color)); /* Blue or Green accent */
   text-decoration: none;
   font-weight: bold;
+  transition: color 0.2s ease;
 }
 
-.loginPrompt a:hover { /* Copied from LoginForm.module.css */
+.loginPrompt a:hover {
   text-decoration: underline;
+  filter: brightness(1.2);
 }

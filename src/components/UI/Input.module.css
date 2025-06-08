@@ -1,48 +1,63 @@
+/* src/components/UI/Input.module.css */
+
 .inputGroup {
-  margin-bottom: 15px;
+  margin-bottom: 15px; /* Or adjust as needed in specific forms */
   width: 100%;
 }
 
 .label {
   display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: var(--text-color);
+  margin-bottom: 8px; /* Adjust as needed */
+  font-weight: 600; /* <<<< MATCH FONT WEIGHT */
+  color: var(--primary-color); /* <<<< MATCH COLOR (GREEN) */
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 1.1rem; /* <<<< MATCH FONT SIZE */
 }
 
 .input {
-  width: 100%; /* Changed to 100% to use box-sizing */
-  padding: 10px;
-  border: 1px solid var(--medium-gray);
-  border-radius: 5px;
-  font-size: 1rem;
-  box-sizing: border-box; /* Important for width calculation */
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  
+  /* --- NEW DEFAULT INPUT STYLE TO MATCH PROFILE DISPLAY FIELDS --- */
+  background-color: var(--ai-chat-box-bg, #1c2b36); /* Dark desaturated blue/teal background */
+  color: var(--text-color);                         /* White/Light Grey text */
+  border: 1px solid var(--ai-chat-box-border-color, var(--primary-color)); /* Green or subtle border */
+  border-radius: 6px;                               /* Match profile field rounding */
+  
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input::placeholder {
+  color: var(--text-secondary-dark-theme);
+  opacity: 0.6; /* Make placeholder slightly more subtle */
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+  border-color: var(--primary-color); /* Bright green border on focus */
+  box-shadow: 0 0 0 3px rgba(0, 179, 134, 0.3); /* Green glow (using your --primary-color) */
 }
 
-.input:disabled {
-  background-color: #e9ecef;
-  cursor: not-allowed;
+.input:disabled { /* This is how profile fields look when not editing */
+  background-color: var(--ai-chat-box-bg, #1c2b36); /* Keep same background */
+  color: var(--text-secondary-dark-theme);      /* Dimmed text */
+  border-color: var(--ai-chat-box-border-color, var(--primary-color)); /* Keep same border */
+  opacity: 0.9; /* Slightly more opaque than typical disabled if it's for display */
+  cursor: default;
 }
 
 .errorInput {
-  border-color: var(--danger-color);
+  border-color: var(--danger-color) !important; /* Ensure error border overrides */
 }
 .errorInput:focus {
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 82, 82, 0.25); /* Red glow for error focus */
 }
 
 .errorMessage {
   color: var(--danger-color);
   font-size: 0.8rem;
-  margin-top: 3px;
+  margin-top: 5px; /* Space above error message */
   text-align: left;
 }

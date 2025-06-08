@@ -1,115 +1,118 @@
+/* src/components/Dashboard/AIAssistant.module.css */
+
+/* Define the background color for these specific boxes if not already a global variable in index.css */
+/* If --ai-box-background is already in index.css, you can remove this :root block */
+:root { 
+  --ai-box-background: #000000; /* Matching disabled input background from your Profile page */
+}
+
+
 .aiAssistantCard {
   display: flex;
   flex-direction: column;
-  height: 75vh;
-  max-height: 700px; /* Max height */
-  min-height: 400px; /* Min height */
+  height: 75vh; 
+  max-height: 700px;
+  min-height: 400px;
+  /* The Card component itself will use var(--surface-color) for its background from Card.module.css */
+  /* We want the elements inside this card to have the specific "profile field" style */
 }
 
+/* Chat Window where messages appear */
 .chatWindow {
   flex-grow: 1;
   overflow-y: auto;
   padding: 15px;
-  border: 1px solid var(--light-gray);
-  border-radius: 8px;
   margin-bottom: 15px;
-  background-color: #f4f7f9; /* Lighter background */
+  
+  /* --- STYLE LIKE PROFILE DISPLAY FIELDS --- */
+  background-color: var(--ai-chat-box-bg, #1c2b36); /* Dark desaturated blue/teal background */
+  border: 1px solid var(--ai-chat-box-border-color, var(--primary-color)); /* Green border (or your chosen border color) */
+  border-radius: 8px; /* Match profile field rounding */
+  
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Space between bubbles */
+  gap: 12px;
 }
 
+/* Individual Message Bubbles - these should contrast with the chat window background */
 .messageBubble {
   padding: 10px 15px;
-  border-radius: 18px; /* More bubbly */
-  max-width: 75%; /* Max width of bubble */
+  border-radius: 18px;
+  max-width: 75%;
   word-wrap: break-word;
   line-height: 1.5;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  color: var(--text-color); 
 }
 
-.messageBubble p {
-  margin: 0;
+.user { /* User's message bubble */
+  background-color: var(--primary-color); /* Green background */
+  color: var(--text-on-primary); /* White text */
+  margin-left: auto;
+  border-bottom-right-radius: 6px;
 }
 
-.user {
-  background-color: var(--secondary-color);
-  color: white;
-  margin-left: auto; /* Align to right */
-  border-bottom-right-radius: 5px; /* Flat edge */
-}
-
-.ai {
-  background-color: #e9ecef; /* Softer AI bubble */
+.ai { /* AI's message bubble */
+  /* Make AI bubbles distinct from the chat window's new background */
+  background-color: var(--ai-bubble-surface, #2a3b4d); /* A different dark shade */
   color: var(--text-color);
-  margin-right: auto; /* Align to left */
-  border-bottom-left-radius: 5px; /* Flat edge */
+  margin-right: auto;
+  border-bottom-left-radius: 6px;
+}
+.ai i { 
+    color: var(--text-secondary-dark-theme);
 }
 
+
+/* Input Area at the bottom */
 .inputArea {
   display: flex;
   gap: 10px;
-  align-items: center; /* Align items vertically */
+  align-items: stretch; 
+  /* The Input component for "Ask FinBot..." will get its style from Input.module.css.
+     We need to ensure Input.module.css provides the "profile field" look for active inputs. */
 }
-
 .inputArea > div { /* Target Input component's wrapper */
   flex-grow: 1;
   margin-bottom: 0;
 }
-.inputArea input { /* Style the actual input element */
-  padding-right: 45px; /* Space for an potential inner button or icon */
-}
 
-.sendButton, .voiceButton {
-  padding: 0; /* Remove padding for icon buttons */
-  width: 42px; /* Square button */
-  height: 42px; /* Square button */
-  font-size: 1.5rem; /* Icon size */
-  line-height: 42px; /* Center icon vertically */
-  border-radius: 50%; /* Circular */
-  flex-shrink: 0; /* Prevent shrinking */
-}
-.voiceButton {
-    position: relative; /* For pulse animation */
-}
+/* Send and Voice Buttons styling comes from Button.module.css */
+.sendButton, .voiceButton { /* ... (Keep existing size/shape styles) ... */ }
+.listeningPulse { /* ... (Keep existing) ... */ }
+@keyframes pulse { /* ... (Keep existing) ... */ }
+.voiceErrorMessage { /* ... (Keep existing) ... */ }
 
-.listeningPulse {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    background-color: white;
-    border-radius: 50%;
-    animation: pulse 1.5s infinite ease-in-out;
-}
-@keyframes pulse {
-    0% { transform: scale(0.8); opacity: 0.7; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(0.8); opacity: 0.7; }
-}
-
-
-.voiceErrorMessage {
-    color: var(--danger-color);
-    font-size: 0.85rem;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
+/* Options like "Speak AI Responses" */
 .chatOptions {
-    margin-top: 10px;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  margin-top: 10px; /* Add space between input and this option */
+  padding: 0; /* Remove padding if input area itself has no distinct background */
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary-dark-theme);
 }
-.chatOptions input[type="checkbox"] {
-    margin-right: 5px;
-}
+.chatOptions input[type="checkbox"] { /* ... (Keep existing) ... */ }
 
 
+/* Note at the bottom */
 .llmNote {
   font-size: 0.8rem;
-  color: var(--dark-gray);
-  margin-top: 15px;
   text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 20px;
+
+  /* --- STYLE LIKE PROFILE DISPLAY FIELDS --- */
+  background-color: var(--ai-chat-box-bg, #1c2b36); 
+  color: var(--text-secondary-dark-theme);
+  border: 1px solid var(--ai-chat-box-border-color, var(--primary-color)); 
+}
+.llmNote code {
+    background-color: var(--border-color-dark-theme); 
+    color: var(--text-color);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
 }

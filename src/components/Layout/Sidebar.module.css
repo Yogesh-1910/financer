@@ -1,77 +1,91 @@
 /* src/components/Layout/Sidebar.module.css */
 
 .sidebar {
-  width: 260px; /* Default open width */
-  background-color: var(--sidebar-bg);
-  color: var(--sidebar-text);
+  width: 250px; /* Or your preferred width */
+  background-color: var(--surface-color); /* Dark surface for sidebar */
+  color: var(--text-color); /* Light text for dark theme */
   display: flex;
   flex-direction: column;
-  position: fixed; /* Fixed position */
-  top: var(--header-height); /* Starts below the header */
+  position: fixed;
+  /* --- CRITICAL ALIGNMENT PROPERTIES --- */
+  top: 60px; /* This MUST match your Navbar's height */
   left: 0;
   bottom: 0;
-  z-index: 1000; /* Below Navbar, above content overlay if any */
-  transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.1); /* Softer shadow */
-  overflow-x: hidden; /* Hide horizontal overflow during transition */
+  /* --- END CRITICAL ALIGNMENT --- */
+  transition: transform 0.3s ease-in-out, width 0.3s ease; /* Added width transition */
+  z-index: 1001; /* Ensure it's above content but can be below modals if needed */
+  box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Slightly more pronounced shadow for dark theme */
+  /* REMOVE padding-top: 60px; if it was here from a previous version and top is already 60px */
+  /* OR if top is 0, then padding-top: 60px is needed. Let's stick to top: 60px for fixed position. */
 }
 
-/* Collapsed state for desktop */
-.sidebar.closed {
-  width: 70px; /* Icon-only width */
-}
-.sidebar.closed .label {
-  display: none; /* Hide text labels */
-}
-.sidebar.closed .navLink,
-.sidebar.closed .logoutButtonSidebar {
-  justify-content: center; /* Center icons */
-}
-.sidebar.closed .icon {
-  margin-right: 0;
-  font-size: 1.4rem; /* Slightly larger icons when collapsed */
-}
-.sidebar.closed .sidebarHeader {
-  height: 10px; /* Maintain consistent small spacer height when collapsed */
-  padding: 0;
-  /* border-bottom: none; if no content and no border needed */
-}
-.sidebar.closed .sidebarAppLogo { /* If you have a logo that changes when collapsed */
-  display: none; /* Hide logo text in collapsed state if it was text, or style a smaller icon logo */
-}
-
-
-/* Mobile behavior: Overlay */
-@media (max-width: 992px) {
+/* --- Mobile Specific Styling --- */
+@media (max-width: 768px) {
   .sidebar {
+    top: 0; /* On mobile, when it slides in, it should cover the navbar area */
     transform: translateX(-100%); /* Hidden by default */
-    width: 260px; /* Full width when open on mobile */
-    top: 0; /* Overlay from the very top on mobile */
-    height: 100vh;
-    z-index: 1005; /* Higher than backdrop, lower than navbar */
+    /* padding-top: 60px; /* Add padding for navbar content IF navbar is still visible behind it */
+    /* Or, if sidebar header contains close button and replaces navbar interaction: */
+    padding-top: 0;
+    height: 100vh; /* Ensure it takes full viewport height */
+    z-index: 1005; /* Higher z-index for mobile overlay */
+
   }
   .sidebar.open {
     transform: translateX(0);
   }
-  /* In mobile view, always show labels if open */
-  .sidebar.open .label {
-    display: block; /* Or flex if needed */
+  .sidebarHeader { /* Only shown on mobile when sidebar is open */
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    /* background-color: var(--surface-color); /* Or a slightly different shade */
+    border-bottom: 1px solid var(--border-color-dark-theme);
+    height: 60px; /* Match navbar height */
+    box-sizing: border-box;
   }
-  .sidebar.open .navLink,
-  .sidebar.open .logoutButtonSidebar {
-    justify-content: flex-start; /* Align items to start */
+  .sidebarUserName { /* If you have this */
+    font-weight: bold;
+    color: var(--text-color);
   }
-  .sidebar.open .icon {
-    margin-right: 15px; /* Restore margin for icon */
-    font-size: 1.2rem; /* Restore icon size */
-  }
-  .sidebar.open .sidebarHeader {
-    /* Ensure space for the main app header when sidebar overlays on mobile */
-    padding-top: calc(var(--header-height) + 5px); /* Small space below the app header */
-    height: auto; /* Let padding define height on mobile header */
-    border-bottom: none; /* No border needed if it's just a spacer on mobile */
+  .closeButtonMobile { /* Style the mobile close button */
+    font-size: 1.5rem;
+    color: var(--text-color) !important; /* Ensure it's visible */
+    background: none !important;
+    padding: 5px !important;
+    border: none;
   }
 }
+
+/* --- Desktop Collapsed State --- */
+@media (min-width: 769px) {
+  .sidebar.closed { /* This class is applied from parent component based on isSidebarOpen/isSidebarCollapsed */
+    width: 60px; /* Your collapsed width */
+    overflow-x: hidden;
+  }
+  .sidebar.closed .label {
+    display: none;
+  }
+  .sidebar.closed .navLink {
+    justify-content: center;
+    padding: 15px 0; /* Adjust padding for icons */
+  }
+  .sidebar.closed .icon {
+    margin-right: 0;
+    font-size: 1.5rem;
+  }
+  .sidebar.closed .sidebarHeader, /* Hide header elements in collapsed desktop view */
+  .sidebar.closed .sidebarFooter .label { /* Hide logout label in collapsed view */
+    display: none;
+  }
+  .sidebar.closed .sidebarFooter .icon { /* Ensure logout icon is centered */
+    margin-right: 0;
+  }
+   .closeButtonMobile {
+    display: none !important; /* Hide mobile specific close button on desktop */
+  }
+}
+
 
 .backdrop {
   position: fixed;
@@ -79,117 +93,159 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.4);
-  z-index: 1001; /* Below sidebar, above content */
+  background-color: rgba(0,0,0,0.6); /* Darker backdrop for dark theme */
+  z-index: 1000;
+  display: none;
 }
-
-
-.sidebarHeader {
-  height: 10px; /* Minimal height to act as a top spacer for nav items */
-  padding: 0; /* No internal padding */
-  border-bottom: none; /* No border if it's just an empty spacer */
-  display: flex; /* Kept for potential future use like a tiny logo/indicator */
-  align-items: center;
-  justify-content: center;
+@media (max-width: 768px) {
+  .sidebar.open + .backdrop, .backdrop.open { /* For mobile overlay */
+    display: block;
+  }
 }
-
-.sidebarAppLogo { /* Style for an optional logo in the header when sidebar is open */
-  /* Example styles if you were to add a logo:
-    max-height: 30px;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-  */
-}
-/* If sidebar is collapsed and you have a logo, you might hide or change it */
-/* .sidebar.closed .sidebarAppLogo { opacity: 0; } */
 
 
 .sidebarNav {
   flex-grow: 1;
   overflow-y: auto;
-  margin-top: 0; /* Nav items start right after the minimal sidebarHeader */
+  margin-top: 10px; /* Space from top or sidebar header */
 }
+
 .sidebarNav ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+/* --- NavLink Styling with Transitions --- */
 .navLink {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  color: var(--sidebar-text);
+  padding: 13px 20px;
+  color: var(--text-secondary-dark-theme); /* Default link text color */
   text-decoration: none;
-  transition: background-color 0.2s ease, color 0.2s ease, border-left-color 0.2s ease;
   white-space: nowrap;
-  font-size: 0.9rem;
-  border-left: 4px solid transparent; /* Indicator space */
-  font-weight: 400; /* Regular weight */
+  font-size: 0.95rem;
+  border-left: 4px solid transparent; /* Transparent border for inactive, thicker for active animation */
+  position: relative; /* Needed for pseudo-elements if used for more complex animations */
+  overflow: hidden; /* Can help contain animated elements if they expand */
+
+  /* --- TRANSITIONS --- */
+  transition: background-color 0.2s ease-in-out, 
+              color 0.2s ease-in-out, 
+              border-left-color 0.25s ease-in-out,
+              padding-left 0.2s ease-in-out; /* Smooth padding change on hover */
 }
 
 .navLink:hover {
-  background-color: rgba(255,255,255,0.05);
-  color: var(--sidebar-text-hover);
+  background-color: rgba(var(--primary-rgb, 0, 179, 134), 0.1); /* Subtle green hover background */
+  color: var(--primary-color); /* Green text on hover */
+  padding-left: 23px; /* Slightly indent text/icon on hover for a subtle push effect */
+  /* border-left-color: rgba(var(--primary-rgb, 0, 179, 134), 0.5); /* Optional: slight border color on hover */
 }
 
 .navLink.active {
-  background-color: var(--sidebar-active-bg);
-  color: var(--sidebar-text-hover);
-  font-weight: 500; /* Medium weight for active */
-  border-left-color: var(--sidebar-active-indicator);
-}
-.navLink.active .icon {
-  color: var(--sidebar-active-indicator); /* Make icon match indicator color */
+  background-color: var(--primary-color); /* Green background for active */
+  color: var(--text-on-primary); /* White text on green */
+  font-weight: 500; /* Or bold */
+  border-left-color: var(--accent-color, var(--primary-color)); /* Use a bright accent for the left border, could be a brighter green or white */
+                                                                /* Let's use the primary green for a solid bar */
+  /* To make the green background slide in (more complex, might need pseudo-elements): */
+  /* For a simpler fade-in, the transition on background-color above handles it. */
 }
 
+/* Icon styling within NavLink */
 .icon {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   margin-right: 15px;
-  min-width: 24px; /* Ensure consistent icon spacing */
-  text-align: center;
-  transition: transform 0.2s ease;
-  color: var(--sidebar-text); /* Default icon color */
+  min-width: 24px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* --- ICON TRANSITIONS --- */
+  transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
 }
+
 .navLink:hover .icon {
-  transform: scale(1.05);
+    transform: translateX(3px) scale(1.05); /* Icon slightly moves right and scales up on link hover */
+    /* color: var(--primary-color); /* Icon color matches text color on hover */
+}
+
+.navLink.active .icon {
+    color: var(--text-on-primary); /* Ensure icon color contrasts with active background */
+    transform: scale(1.1); /* Slightly larger icon when active */
 }
 
 .label {
-  font-size: 0.9rem; /* Consistent label size */
+  font-size: 1rem;
+  transition: color 0.2s ease-in-out; /* For smooth text color change */
 }
 
-.sidebarFooter {
-  padding: 15px 0px; /* Padding around the button itself */
-  border-top: 1px solid rgba(255,255,255,0.08); /* Softer border */
-  margin: 0 15px; /* Margin for the footer container */
-}
+
+/* Logout Button Styling with Transitions */
 .logoutButtonSidebar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 10px 20px; /* Match navLink padding when open */
-  font-size: 0.9rem;
-  background-color: transparent;
-  color: var(--sidebar-text);
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  border-radius: 4px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    background-color: transparent;
+    color: var(--text-secondary-dark-theme);
+    border: none; /* Clean button */
+    /* border-top: 1px solid var(--border-color-dark-theme); /* Separator line from footer */
+    text-align: left;
+    cursor: pointer;
+    
+    /* --- TRANSITIONS --- */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, padding-left 0.2s ease-in-out;
 }
 .logoutButtonSidebar:hover {
-  background-color: rgba(220,53,69,0.15); /* Danger color tint on hover */
-  color: var(--danger-color);
-}
-.logoutButtonSidebar .icon {
-    margin-right: 15px; /* Ensure consistent icon spacing */
-}
-.logoutButtonSidebar:hover .icon {
+    background-color: rgba(var(--danger-rgb, 255, 82, 82), 0.1); /* Subtle red hover */
     color: var(--danger-color);
+    padding-left: 23px; /* Indent on hover */
+}
+.logoutButtonSidebar:hover .icon { /* Style icon on logout button hover */
+    transform: translateX(3px) scale(1.05);
+    /* color: var(--danger-color); /* Icon also turns red */
 }
 
-/* When sidebar is collapsed, logout button also centers its icon */
-.sidebar.closed .logoutButtonSidebar .icon {
+.logoutButtonSidebar .icon { /* Ensure icon in logout button is styled like other icons */
+    font-size: 1.3rem;
+    margin-right: 15px;
+    min-width: 24px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out; /* Add transition to icon */
+}
+
+/* When sidebar is collapsed on desktop */
+@media (min-width: 769px) {
+  .sidebar.closed .icon {
     margin-right: 0;
+    font-size: 1.6rem;
+    width: auto;
+    height: auto;
+  }
+  .sidebar.closed .navLink:hover {
+    padding-left: 0; /* No padding change for collapsed icons */
+  }
+  .sidebar.closed .navLink:hover .icon {
+    transform: scale(1.15); /* Just scale icon on hover when collapsed */
+  }
+  .sidebar.closed .logoutButtonSidebar {
+    justify-content: center; /* Center icon in collapsed logout button */
+  }
+  .sidebar.closed .logoutButtonSidebar:hover {
+    padding-left: 0;
+  }
+  .sidebar.closed .logoutButtonSidebar:hover .icon {
+     transform: scale(1.15);
+  }
+  /* ... other .sidebar.closed styles ... */
 }

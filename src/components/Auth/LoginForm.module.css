@@ -1,47 +1,82 @@
+/* src/components/Auth/LoginForm.module.css */
+
 .loginFormContainer {
   max-width: 400px;
-  margin: 50px auto;
-  padding: 30px 35px;
-  background-color: var(--background-color);
-  border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 35px 40px;
+  
+  /* --- TRANSLUCENT BACKGROUND --- */
+  /* Define your base dark surface color's RGB values if not already a CSS variable */
+  /* For example, if var(--surface-color) is #1A202C (Decimal: R=26, G=32, B=44) */
+  /* You would need --surface-color-rgb: 26, 32, 44; in your index.css */
+  background-color: rgba(var(--surface-color-rgb, 26, 32, 44), 0.85); /* Dark surface with 85% opacity */
+  /* Adjust 0.85 (85% opacity) to your liking. Lower is more transparent. */
+
+  /* Optional: Frosted Glass Effect (good browser support needed) */
+  /* backdrop-filter: blur(8px) saturate(150%); */
+  /* -webkit-backdrop-filter: blur(8px) saturate(150%); */ /* For Safari */
+
+  color: var(--text-color, #EAEAEA); 
+  border-radius: 12px; /* Slightly more rounded for a softer look */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7); /* Stronger shadow to help it "float" */
   text-align: center;
-  border: 1px solid #ddd;
+  /* Border can be subtle or match the translucency */
+  border: 1px solid rgba(var(--border-color-dark-theme-rgb, 45, 55, 72), 0.5); /* Translucent border */
+  /* Or a solid, less transparent border: */
+  /* border: 1px solid var(--border-color-dark-theme, #2D3748); */
+
+  position: relative; 
+  z-index: 1; 
 }
 
 .loginFormContainer h2 {
-  color: var(--primary-color);
+  color: var(--primary-color); 
   margin-bottom: 25px;
   font-weight: 600;
+  font-size: 1.8rem;
+  /* Add a subtle text shadow if text becomes hard to read over video */
+  /* text-shadow: 0px 1px 3px rgba(0,0,0,0.5); */
 }
 
 .errorMessage {
   color: var(--danger-color);
-  background-color: rgba(220, 53, 69, 0.1);
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  border: 1px solid rgba(220, 53, 69, 0.2);
+  /* Make error message background slightly more opaque for readability */
+  background-color: rgba(var(--danger-rgb, 255, 82, 82), 0.25); 
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(var(--danger-rgb, 255, 82, 82), 0.5);
   font-size: 0.9rem;
+  text-align: left;
 }
+
+/* Input fields inside will need to have their own opaque or slightly less translucent background
+   to ensure text typed into them is readable. Input.module.css handles this.
+   If Input.module.css made inputs fully transparent, text might be hard to read.
+   Usually, inputs have a solid (even if dark) background.
+*/
 
 .loginButton {
   width: 100%;
-  margin-top: 10px;
-  padding: 12px 20px; /* Bigger button */
+  margin-top: 20px;
+  padding: 12px 20px;
+  /* Button styling (solid green) from Button.module.css will make it stand out */
 }
 
 .signupPrompt {
-  margin-top: 20px;
+  margin-top: 25px;
   font-size: 0.9rem;
+  color: var(--text-secondary-dark-theme);
+  /* text-shadow: 0px 1px 2px rgba(0,0,0,0.4); /* Optional shadow for readability */
 }
 
 .signupPrompt a {
-  color: var(--secondary-color);
+  color: var(--secondary-color-dark-theme, var(--primary-color));
   text-decoration: none;
   font-weight: bold;
+  transition: color 0.2s ease;
 }
 
 .signupPrompt a:hover {
   text-decoration: underline;
+  filter: brightness(1.2);
 }

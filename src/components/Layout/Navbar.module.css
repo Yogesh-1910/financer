@@ -1,45 +1,49 @@
 /* src/components/Layout/Navbar.module.css */
+
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 25px;
-  height: var(--header-height); /* Use CSS variable */
-  background-color: var(--background-color); /* White header */
-  color: var(--text-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Softer shadow */
-  position: sticky; /* Make it sticky if you want, or fixed */
+  padding: 0 20px;
+  height: 60px; /* Standard navbar height, ensure this is consistent */
+  background-color: var(--surface-color); /* Your dark surface color for navbar */
+  color: var(--text-color); /* Light text on dark navbar */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.25); /* Slightly stronger shadow for dark theme */
+  position: sticky;
   top: 0;
-  z-index: 1010; /* Highest z-index */
-  border-bottom: 1px solid var(--border-color);
+  z-index: 1002; /* High z-index */
 }
 
 .navLeft {
   display: flex;
   align-items: center;
+  gap: 12px; /* Space between menu button and brand */
 }
 
 .menuButton {
-  font-size: 1.5rem;
-  color: var(--text-color) !important; /* Override button text variant color */
-  margin-right: 15px;
-  background: none !important;
-  padding: 8px !important;
+  background: none;
+  border: none;
+  color: var(--text-color); /* Light icon color */
+  font-size: 1.7rem; /* Adjust size of MdMenu/MdClose icon */
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out; /* Added transform */
 }
 .menuButton:hover {
-  background-color: rgba(0,0,0,0.05) !important;
+  background-color: rgba(255,255,255,0.1); /* Subtle hover */
 }
-
-.appLogo {
-    height: 30px; /* Adjust if you add a logo */
-    margin-right: 10px;
+.menuButton:active {
+  transform: scale(0.9); /* Small shrink on click for feedback */
 }
 
 .brand {
-  font-size: 1.7rem;
-  font-weight: 700; /* Bolder */
-  color: var(--primary-color); /* Use primary color for brand */
+  font-size: 1.7rem; /* Slightly larger brand name */
+  font-weight: 700;
+  color: var(--primary-color); /* Your green color */
   text-decoration: none;
   letter-spacing: 0.5px;
 }
@@ -49,37 +53,29 @@
   align-items: center;
 }
 
-.profileLink {
+/* --- Styling for the Profile Link Area --- */
+.profileLinkContainer { /* This is the <Link> wrapper */
   display: flex;
   align-items: center;
-  text-decoration: none;
-  color: var(--text-color);
+  gap: 10px;
   padding: 6px 12px;
   border-radius: 25px; /* Pill shape */
-  transition: background-color 0.2s ease;
+  text-decoration: none;
+  background-color: transparent; /* Default state */
+  color: var(--text-color); /* Default text (should be light for dark navbar) */
+  cursor: pointer;
+  transition: background-color 0.25s ease-in-out; /* Smooth transition for background */
 }
-.profileLink:hover {
-  background-color: #e9ecef; /* Light hover for profile link */
+
+.profileLinkContainer:hover {
+  background-color: #000000; /* <<<< BLACK BACKGROUND ON HOVER */
+  /* Text color inside should remain light if var(--text-color) is light */
 }
 
 .usernameNav {
-  margin-right: 10px; /* Username before avatar */
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text-light);
+  color: var(--text-color); /* Explicitly set to ensure it's light */
+  /* No transition needed here if parent hover handles it or if color doesn't change */
 }
-
-@media (max-width: 768px) {
-  .navbar {
-    padding: 0 15px;
-  }
-  .usernameNav {
-    display: none;
-  }
-  .profileLink {
-    padding: 5px; /* Just avatar */
-  }
-  .brand {
-    font-size: 1.4rem;
-  }
-}
+/* UserAvatar styling comes from UserAvatar.module.css */

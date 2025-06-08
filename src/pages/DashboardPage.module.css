@@ -1,17 +1,19 @@
 /* src/pages/DashboardPage.module.css */
 
-.dashboardHome {
+.dashboardHome { /* Renamed to avoid conflict with DashboardHome component name, if you used that for container before */
   display: flex;
   flex-direction: column;
-  gap: 25px; /* Space between profile card and news card */
+  gap: 25px;
 }
 
-/* Profile Summary Card */
+/* Profile Summary Card (Welcome Section) - Assuming this is the top "Welcome back" card */
 .profileSummaryCard {
-  /* Card styles are from UI/Card.module.css, add specific overrides if needed */
+  /* This likely uses styles from UI/Card.module.css. 
+     If it has its own distinct background that needs to be dark, adjust it here or in Card.module.css.
+     For now, assuming it inherits dark theme from Card or body. */
 }
 
-.profileHeader {
+.profileHeader { /* For "Welcome back, danush!" and image */
   display: flex;
   align-items: center;
   gap: 20px;
@@ -19,81 +21,109 @@
 }
 
 .profilePic {
-  width: 80px; /* Adjust size as needed */
+  width: 80px;
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--primary-color);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  /* Profile pic border uses --primary-color, which should now be your green */
+  border: 3px solid var(--primary-color); 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* This shadow might be less visible on dark, adjust if needed */
 }
 
-.profileInfo h2 {
+.profileInfo h2 { /* "Welcome back, danush!" */
   margin-top: 0;
   margin-bottom: 5px;
   font-size: 1.8rem;
-  color: var(--text-color);
+  color: var(--text-color); /* Should be white/light grey from your dark theme index.css */
 }
-.profileInfo p {
+.profileInfo p { /* "Here's a quick overview..." */
   margin: 0;
   font-size: 1rem;
-  color: var(--dark-gray);
+  color: var(--dark-gray); /* Should be your lighter grey for secondary text from index.css */
 }
 
+/* Grid for Financial Summary Boxes */
 .financialSummaryGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 20px;
 }
 
+/* --- UPDATED .summaryBox Styles --- */
 .summaryBox {
-  background-color: #f9f9fb;
+  background-color: #000000; /* NEW: Black background */
+  color: #FFFFFF;             /* NEW: White text for content inside */
   padding: 15px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 15px;
-  border-left: 4px solid var(--primary-color);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  /* border-left: 4px solid var(--primary-color); /* Old left border - removing for full border */
+  border: 2px solid var(--primary-color); /* NEW: Green border all around */
+  box-shadow: 0 2px 5px rgba(0, 179, 134, 0.1); /* Optional: Subtle green glow or darker shadow */
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
-.summaryBox.red {
- border-left-color: var(--danger-color);
+.summaryBox:hover { /* Optional hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 179, 134, 0.2);
 }
-.summaryBox.green {
- border-left-color: var(--success-color);
-}
+/* Removing .summaryBox.red and .summaryBox.green as the border is now always green */
+/* If you need different border colors for specific boxes, you can add them back */
 
 
 .summaryIcon {
-  font-size: 2rem;
+  font-size: 1.8rem; /* Slightly smaller to fit better with new design */
   padding: 8px;
-  border-radius: 50%;
-  background-color: rgba(0,0,0,0.05);
+  border-radius: 50%; /* Circular background for icon */
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
+  /* Icon background and color: */
+  /* Option 1: Green background, black icon (like your reference for Loan tracker) */
+  background-color: var(--primary-color); /* Green background */
+  color: #000000; /* Black icon for contrast on green */
+  /* Option 2: Transparent background, icon inherits card's white text color or is green */
+  /* background-color: transparent; */
+  /* color: var(--text-color); /* White icon */
+  /* color: var(--primary-color); /* Or Green icon */
 }
 
-.summaryText h4 {
+.summaryText h4 { /* Title like "MONTHLY INCOME" */
   margin: 0 0 5px 0;
-  font-size: 0.9rem;
-  color: var(--dark-gray);
+  font-size: 0.8rem; /* Slightly smaller for this design */
+  color: #FFFFFF;     /* NEW: White text */
+  opacity: 0.8;        /* Make it slightly less prominent than the value */
   text-transform: uppercase;
   font-weight: 500;
 }
-.summaryText p {
+.summaryText p { /* Value like "₹75,000" */
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.5rem; /* Larger value */
   font-weight: bold;
-  color: var(--text-color);
+  color: #FFFFFF;     /* NEW: White text */
 }
 
 
-/* News Card */
+/* News Card Styling */
 .newsCard {
-  /* Styles from UI/Card.module.css */
+  /* Assumes this uses UI/Card.module.css for its base dark theme styles.
+     If its title needs to be green, and it has a .cardTitle class from Card.js: */
 }
+/* If the Card component's title (likely an <h2>) has a class like styles.cardTitle from Card.module.css,
+   you might need to target it more specifically or ensure Card.module.css makes title green
+   if --primary-color is used there for titles.
+   Let's assume the Card component's title is targeted like this if it's inside .newsCard */
+.newsCard h2 { /* A common way to target the title if Card.js renders an H2 */
+    color: var(--primary-color) !important; /* NEW: Green news heading - !important if overridden by general h2 */
+}
+/* Or, if Card.js uses a specific class for title that you can target from here: */
+/* .newsCard .specificCardTitleClassFromCardJS { 
+    color: var(--primary-color) !important;
+} */
+
+
 .newsErrorMessage {
  color: var(--danger-color);
  text-align: center;
@@ -105,14 +135,14 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Space between news items */
+  gap: 15px; /* Reduced gap for a tighter list */
 }
 
 .newsItem {
   display: flex;
   gap: 15px;
   padding-bottom: 15px;
-  border-bottom: 1px solid var(--light-gray);
+  border-bottom: 1px solid var(--border-color-dark-theme); /* Use dark theme border */
 }
 .newsItem:last-child {
   border-bottom: none;
@@ -120,48 +150,51 @@
 }
 
 .newsImage {
-  width: 100px;
-  height: 70px;
+  width: 80px; /* Slightly smaller image for this tighter layout */
+  height: 60px;
   object-fit: cover;
   border-radius: 5px;
-  flex-shrink: 0; /* Prevent image from shrinking */
+  flex-shrink: 0;
 }
 
 .newsContent {
   display: flex;
   flex-direction: column;
+  justify-content: center; /* Align text content better */
 }
 
-.newsTitle {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--secondary-color);
+.newsTitle { /* News article title (the link) */
+  font-size: 1rem;
+  font-weight: 500; /* Medium weight */
+  color: var(--text-color) !important;      /* NEW: White text for news titles */
   text-decoration: none;
   margin-bottom: 5px;
-  display: -webkit-box; /* For text truncation */
- -webkit-line-clamp: 2;
- -webkit-box-orient: vertical;
- overflow: hidden;
- text-overflow: ellipsis;
+  line-height: 1.3;
+   display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .newsTitle:hover {
+  color: var(--primary-color) !important;   /* NEW: Green on hover */
   text-decoration: underline;
 }
 
-.newsDescription {
-  font-size: 0.9rem;
-  color: #555;
+.newsDescription { /* Sub-text for news item */
+  font-size: 0.85rem;
+  color: var(--text-secondary-dark-theme) !important; /* NEW: Lighter grey for news description */
   margin-bottom: 8px;
   line-height: 1.4;
-  display: -webkit-box; /* For text truncation */
- -webkit-line-clamp: 2;
- -webkit-box-orient: vertical;
- overflow: hidden;
- text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.newsSource {
-  font-size: 0.8rem;
-  color: var(--dark-gray);
-  margin-top: auto; /* Pushes source to the bottom if content is short */
+.newsSource { /* Source and date */
+  font-size: 0.75rem;
+  color: var(--text-secondary-dark-theme) !important; /* NEW: Lighter grey for source */
+  margin-top: auto;
 }

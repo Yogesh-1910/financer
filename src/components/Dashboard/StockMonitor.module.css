@@ -1,155 +1,177 @@
+/* src/components/Dashboard/StockMonitor.module.css */
+
+/* Form for adding a new symbol */
 .addSymbolForm {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
   align-items: stretch; /* Make button same height as input */
+  margin-bottom: 25px;
+  padding: 15px;
+  
+  /* --- NEW: Black background, Green border --- */
+  background-color: #0D121C; 
+  border: 2px solid var(--primary-color); /* Your green */
+  border-radius: 8px;
 }
-.addSymbolForm > div { /* Input group */
+/* The Input component within .addSymbolForm will get its style (black bg, green border, white text)
+   from Input.module.css. */
+.addSymbolForm > div { /* Target Input component's wrapper */
   flex-grow: 1;
   margin-bottom: 0;
 }
-.addSymbolForm button {
-    flex-shrink: 0; /* Prevent button from shrinking */
+.addSymbolForm button { /* "Add Symbol" button */
+    flex-shrink: 0;
+    /* Styling comes from Button.module.css using --primary-color (green) */
 }
+
 
 .globalErrorMessage {
   color: var(--danger-color);
-  margin-bottom: 15px;
-  background-color: rgba(220,53,69,0.1);
+  background-color: rgba(var(--danger-rgb, 255, 82, 82), 0.15);
+  border: 1px solid rgba(var(--danger-rgb, 255, 82, 82), 0.3);
   padding: 10px;
   border-radius: 4px;
   text-align: center;
+  margin-bottom: 15px;
 }
 
+/* Grid for displaying stock cards */
 .stockGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Slightly wider cards */
-  gap: 20px; /* Increased gap */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
 }
 
-.stockCard {
-  background-color: var(--background-color);
-  padding: 15px;
+/* Individual Stock Card Styling */
+.stockCard, .stockCardV2 { /* Apply to ensure all versions get styled */
+  /* --- NEW: Black background, Green border, White text --- */
+  background-color: #0D121C;
+  color: var(--text-color); /* Default text inside card */
+  border: 2px solid var(--primary-color); /* Your green */
+  
+  padding: 18px;
   border-radius: 8px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.07);
-  border: 1px solid var(--light-gray);
+  box-shadow: 0 1px 3px rgba(0, 179, 134, 0.1); /* Optional: Subtle green tint shadow */
   position: relative;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px; /* Adjusted min-height */
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
-.stockCard:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+.stockCard:hover, .stockCardV2:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 179, 134, 0.2);
 }
-
-.stockCard.loading {
+.stockCard.loading, .stockCardV2.loading {
     opacity: 0.7;
 }
-.stockCard.errorCard {
-    border-left: 4px solid var(--danger-color);
+.stockCard.errorCard, .stockCardV2.errorCard {
+    border-color: var(--danger-color); /* Keep full border red for error */
 }
 
 
-.cardHeader {
+.cardHeader, .cardHeaderV2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color-dark-theme); /* Use a subtle dark theme border */
 }
-
-.cardHeader h3 {
+.cardHeader h3, .cardHeaderV2 h3 { /* Stock Symbol Text */
   margin: 0;
-  color: var(--primary-color);
-  font-size: 1.2rem; /* Adjusted size */
+  color: var(--text-color); /* White/Light Grey */
+  font-size: 1.2rem;
   font-weight: 600;
 }
+.cardHeader .symbolTicker, .cardHeaderV2 .symbolTicker {
+    color: var(--text-secondary-dark-theme);
+    font-size: 0.9em;
+    margin-left: 5px;
+}
 
-.cardActions {
+
+.cardActions, .cardActionsV2 {
     display: flex;
-    gap: 5px;
+    gap: 8px;
 }
 .actionButton {
   font-size: 1.1rem !important;
-  color: var(--dark-gray) !important;
-  padding: 2px 6px !important;
+  color: var(--text-secondary-dark-theme) !important;
+  padding: 3px 7px !important;
   background: none !important;
   border-radius: 4px;
 }
 .actionButton:hover {
-    background-color: rgba(0,0,0,0.08) !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
 }
 .removeButton {
   color: var(--danger-color) !important;
 }
 .removeButton:hover {
-    background-color: rgba(220,53,69,0.1) !important;
+    background-color: rgba(var(--danger-rgb, 255, 82, 82), 0.15) !important;
 }
 
 
+/* Price and Change display */
 .price {
-  font-size: 1.9rem; /* Larger price */
+  font-size: 1.9rem;
   font-weight: bold;
-  margin: 8px 0;
+  margin: 10px 0; /* Increased margin for better spacing */
   color: var(--text-color);
   text-align: center;
 }
 
 .change {
   font-size: 1rem;
-  margin: 5px 0 10px 0; /* Added bottom margin */
+  margin: 0 0 10px 0; /* Adjusted margin */
   text-align: center;
 }
+.positive { color: var(--success-color); } /* Your Finance Green */
+.positive::before { content: "▲ "; }
+.negative { color: var(--danger-color); } /* Your Bright Red */
+.negative::before { content: "▼ "; }
+.neutral { color: var(--text-secondary-dark-theme); }
 
-.positive {
-  color: var(--success-color);
-}
-.positive::before {
-    content: "▲ ";
-}
-
-.negative {
-  color: var(--danger-color);
-}
-.negative::before {
-    content: "▼ ";
-}
-
-.neutral {
-  color: var(--dark-gray);
-}
 
 .symbolError {
   color: var(--danger-color);
   font-size: 0.85rem;
   margin-top: 10px;
   text-align: center;
-  padding: 5px;
-  background-color: rgba(220,53,69,0.05);
+  padding: 8px;
+  background-color: rgba(var(--danger-rgb, 255, 82, 82), 0.1);
   border-radius: 4px;
 }
 
-.loader {
-  border: 4px solid #f3f3f3; /* Light grey */
-  border-top: 4px solid var(--primary-color); /* Blue */
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
-}
+/* Loader styles */
+.loaderMessage { /* ... (keep existing) ... */ }
+.loader { /* ... (keep existing, ensure border-top is var(--primary-color)) ... */ }
+@keyframes spin { /* ... (keep existing) ... */ }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+/* Chart Container (if used) */
+.chartContainer { /* ... (keep existing) ... */ }
+.chartError { /* ... (keep existing) ... */ }
 
+
+/* API Attribution Note */
 .apiNote {
   font-size: 0.8rem;
-  color: var(--dark-gray);
-  margin-top: 25px;
   text-align: center;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 30px;
+  
+  /* --- NEW: Black background, Green border, Lighter Grey text --- */
+  background-color: #0D121C;
+  color: var(--text-secondary-dark-theme);
+  border: 2px solid var(--primary-color); /* Your green */
+}
+.apiNote code {
+    background-color: var(--border-color-dark-theme); 
+    color: var(--text-color);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
 }

@@ -1,199 +1,353 @@
+// src/components/Dashboard/BudgetExcelView.js
 import React, { useState, useEffect, useMemo } from 'react';
 import Card from '../UI/Card';
 import Button from '../UI/Button';
 import Input from '../UI/Input';
 import styles from './BudgetExcelView.module.css';
-import * as XLSX from 'xlsx'; // Import the xlsx library
-import { saveAs } from 'file-saver'; // Import file-saver
+import budgetService from '../../api/budgetService';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import { useAuth } from '../../contexts/AuthContext';
 
-// Helper to format currency (already present in your code)
+// --- Custom Event Names (Exported for DashboardHome to use) ---
+export const USER_DATA_UPDATED_EVENT = 'userDataUpdated'; // For salary from localStorage
+export const BUDGET_ITEMS_UPDATED_EVENT = 'budgetItemsUpdated'; // For backend budget items
+
 const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(amount);
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(amount || 0);
 };
-
+const getCurrentMonthYear = () => new Date().toISOString().slice(0, 7);
 
 const BudgetExcelView = () => {
-  // ... (all your existing state and useEffect hooks: salary, items, newItem, etc.)
-  const [salary, setSalary] = useState(() => parseFloat(localStorage.getItem('budgetSalary')) || 75000);
-  const [items, setItems] = useState(() => {
-    const savedItems = localStorage.getItem('budgetItems');
-    return savedItems ? JSON.parse(savedItems) : [
-      { id: 1, category: 'EMI', name: 'Home Loan EMI', monthlyAmount: 20000, totalAmount: 2400000, type: 'expense' },
-      { id: 2, category: 'EMI', name: 'Car Loan EMI', monthlyAmount: 8000, totalAmount: 480000, type: 'expense' },
-      { id: 3, category: 'Living Expenses', name: 'Groceries', monthlyAmount: 10000, type: 'expense' },
-      { id: 4, category: 'Living Expenses', name: 'Utilities (Elec, Water)', monthlyAmount: 3000, type: 'expense' },
-      { id: 5, category: 'Investment', name: 'Mutual Fund SIP', monthlyAmount: 5000, type: 'expense' },
-    ];
-  });
+  const { currentUser } = useAuth();
+  const [items, setItems] = useState([]); // For backend-driven items (expenses, other incomes)
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [newItem, setNewItem] = useState({ category: 'Living Expenses', name: '', monthlyAmount: '', type: 'expense' });
-  const [isAdding, setIsAdding] = useState(false);
+  const initialNewItemState = {
+    monthYear: getCurrentMonthYear(),
+    category: 'Living Expenses',
+    itemName: '',
+    plannedAmount: '',
+    type: 'expense',
+    notes: ''
+  };
+  const [formVisible, setFormVisible] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [formData, setFormData] = useState(initialNewItemState);
 
+  const salaryStorageKey = useMemo(() => `financeAppUserSalary_${currentUser?.id}`, [currentUser]);
+  const [salaryInputValue, setSalaryInputValue] = useState('');
+
+  // Load initial data: salary from localStorage, other items from backend
   useEffect(() => {
-    localStorage.setItem('budgetSalary', salary.toString());
-  }, [salary]);
+    const loadData = async () => {
+      if (!currentUser?.id) {
+        setIsLoading(false);
+        setError("User not available. Please log in.");
+        return;
+      }
+      setIsLoading(true);
+      setError(null);
+      try {
+        const storedSalary = localStorage.getItem(salaryStorageKey);
+        setSalaryInputValue(storedSalary || '0');
 
-  useEffect(() => {
-    localStorage.setItem('budgetItems', JSON.stringify(items));
-  }, [items]);
+        const fetchedItems = await budgetService.getBudgetItems();
+        setItems(fetchedItems || []);
+        console.log("[BudgetExcelView] Initial data loaded. Salary (LS):", storedSalary, "Items (BE):", fetchedItems);
+      } catch (err) {
+        console.error("[BudgetExcelView] Failed to load initial data:", err);
+        setError(err.response?.data?.msg || err.message || "Could not load budget data.");
+      }
+      setIsLoading(false);
+    };
+    loadData();
+  }, [currentUser, salaryStorageKey]); // Rerun if user changes
 
-  const handleAddItem = (e) => {
+  const handleSalaryInputChange = (e) => {
+    setSalaryInputValue(e.target.value);
+  };
+
+  const handleSaveSalary = async () => {
+    if (!currentUser?.id) return;
+    const amount = parseFloat(salaryInputValue);
+    if (isNaN(amount) || amount < 0) {
+      setError("Please enter a valid positive salary amount.");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+    setError(null);
+    try {
+      localStorage.setItem(salaryStorageKey, amount.toString());
+      console.log("[BudgetExcelView] Salary saved to localStorage:", amount);
+      window.dispatchEvent(new CustomEvent(USER_DATA_UPDATED_EVENT, { detail: { salary: amount } }));
+      alert("Salary updated successfully!");
+    } catch (err) {
+      console.error("[BudgetExcelView] Failed to save salary:", err);
+      setError("Could not save salary.");
+    }
+  };
+
+  const handleFormInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const openFormForAdd = () => {
+    setEditingItem(null);
+    setFormData(initialNewItemState);
+    setFormVisible(true);
+    setError(null);
+  };
+
+  const openFormForEdit = (item) => {
+    setEditingItem(item);
+    setFormData({
+      ...item,
+      plannedAmount: item.plannedAmount !== null ? String(item.plannedAmount) : '',
+      actualAmount: item.actualAmount !== null ? String(item.actualAmount) : '',
+      notes: item.notes || ''
+    });
+    setFormVisible(true);
+    setError(null);
+  };
+
+  const closeForm = () => {
+    setFormVisible(false);
+    setEditingItem(null);
+    setFormData(initialNewItemState);
+    setError(null);
+  };
+
+  const handleSubmitItem = async (e) => {
     e.preventDefault();
-    if (!newItem.name || !newItem.monthlyAmount) {
-        alert("Please provide item name and monthly amount.");
+    setError(null);
+    const itemDataToSubmit = editingItem || formData;
+    const plannedAmt = parseFloat(itemDataToSubmit.plannedAmount);
+
+    if (!itemDataToSubmit.itemName || !itemDataToSubmit.monthYear || !itemDataToSubmit.category || !itemDataToSubmit.type || isNaN(plannedAmt)) {
+      setError("Month/Year, Item Name, Category, Type, and a valid Planned Amount are required.");
+      return;
+    }
+    // Ensure type is not 'income' AND category is 'Salary' if salary is managed separately
+    if (itemDataToSubmit.type === 'income' && itemDataToSubmit.category?.toLowerCase() === 'salary') {
+        setError("Please manage 'Monthly Salary' through the dedicated salary input field above.");
         return;
     }
-    setItems([...items, { ...newItem, id: Date.now(), monthlyAmount: parseFloat(newItem.monthlyAmount) }]);
-    setNewItem({ category: 'Living Expenses', name: '', monthlyAmount: '', type: 'expense' });
-    setIsAdding(false);
-  };
 
-  const handleRemoveItem = (id) => {
-    if(window.confirm("Are you sure you want to delete this item?")) {
-        setItems(items.filter(item => item.id !== id));
+    const payload = {
+      ...itemDataToSubmit,
+      plannedAmount: plannedAmt,
+      actualAmount: itemDataToSubmit.actualAmount ? parseFloat(itemDataToSubmit.actualAmount) : null,
+      notes: itemDataToSubmit.notes || null,
+    };
+    if (!editingItem && payload.id) delete payload.id; // Remove ID for new items
+
+    console.log("[BudgetExcelView] Submitting budget item to backend:", payload);
+    try {
+      let result;
+      if (editingItem) {
+        result = await budgetService.updateBudgetItem(editingItem.id, payload);
+        setItems(prev => prev.map(it => it.id === result.id ? result : it));
+      } else {
+        result = await budgetService.addBudgetItem(payload);
+        setItems(prev => [...prev, result]);
+      }
+      closeForm();
+      window.dispatchEvent(new CustomEvent(BUDGET_ITEMS_UPDATED_EVENT));
+      console.log("[BudgetExcelView] Budget item saved successfully.");
+    } catch (err) {
+      console.error("[BudgetExcelView] Failed to save budget item:", err.response?.data || err.message);
+      setError(err.response?.data?.msg || err.response?.data?.error || "Could not save budget item.");
     }
   };
 
-  const totalExpenses = useMemo(() => {
-    return items.reduce((sum, item) => item.type === 'expense' ? sum + item.monthlyAmount : sum, 0);
+  const handleRemoveItem = async (id) => {
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      setError(null);
+      try {
+        await budgetService.deleteBudgetItem(id);
+        setItems(prev => prev.filter(item => item.id !== id));
+        window.dispatchEvent(new CustomEvent(BUDGET_ITEMS_UPDATED_EVENT));
+        console.log("[BudgetExcelView] Budget item deleted successfully.");
+      } catch (err) {
+        console.error("[BudgetExcelView] Failed to delete item:", err.response?.data || err.message);
+        setError(err.response?.data?.msg || err.response?.data?.error || "Could not delete item.");
+      }
+    }
+  };
+
+  // --- Memoized Calculations ---
+  const currentSalaryFromStorage = useMemo(() => {
+    if (!currentUser?.id) return 0;
+    return parseFloat(localStorage.getItem(salaryStorageKey)) || 0;
+  }, [salaryStorageKey, items]); // Re-calculate if items change to force re-render from event
+
+  const otherIncomeFromItems = useMemo(() => {
+    return items
+      .filter(item => item.type === 'income' && item.category?.toLowerCase() !== 'salary')
+      .reduce((sum, item) => sum + (parseFloat(item.plannedAmount) || 0), 0);
   }, [items]);
 
-  const netSavings = useMemo(() => salary - totalExpenses, [salary, totalExpenses]);
+  const totalIncomeForDisplay = useMemo(() => currentSalaryFromStorage + otherIncomeFromItems, [currentSalaryFromStorage, otherIncomeFromItems]);
 
-  // This is the data that will be displayed in the table AND exported
-  const budgetSummary = useMemo(() => {
-    const summary = [
-        { category: 'Income', item: 'Monthly Salary', monthly: salary, total: salary * 12, isHeader: true },
-    ];
-    items.forEach(it => {
-        summary.push({
-            category: it.category,
-            item: it.name,
-            monthly: it.monthlyAmount,
-            total: it.totalAmount || it.monthlyAmount * 12,
-            id: it.id
-        });
+  const totalExpenses = useMemo(() => {
+    return items
+      .filter(item => item.type === 'expense')
+      .reduce((sum, item) => sum + (parseFloat(item.plannedAmount) || 0), 0);
+  }, [items]);
+
+  const netSavings = useMemo(() => totalIncomeForDisplay - totalExpenses, [totalIncomeForDisplay, totalExpenses]);
+
+  const budgetSummaryForTable = useMemo(() => {
+    const summary = [];
+    // Add salary row from localStorage
+    summary.push({
+      id: 'salary-ls', // Unique key for table
+      monthYear: getCurrentMonthYear(), // Or a more general label
+      category: 'Salary',
+      itemName: 'Monthly Salary (from settings)',
+      type: 'income',
+      monthly: currentSalaryFromStorage,
+      total: currentSalaryFromStorage * 12,
+      isLocalStorageSalary: true // Flag to prevent edit/delete buttons for this row
     });
-    summary.push({ category: 'Summary', item: 'Total Expenses', monthly: totalExpenses, total: totalExpenses * 12, isHeader: true, isExpenseTotal: true });
-    summary.push({ category: 'Summary', item: 'Net Savings', monthly: netSavings, total: netSavings * 12, isHeader: true, isSavings: true });
+
+    // Add other income and expense items from backend
+    items.forEach(it => {
+      summary.push({ ...it, monthly: it.plannedAmount, total: (it.plannedAmount || 0) * 12 });
+    });
+
+    // Add summary totals
+    summary.push({ category: 'Summary', itemName: 'Total Income', monthly: totalIncomeForDisplay, total: totalIncomeForDisplay * 12, isHeader: true, isIncomeTotal: true, type: 'summary' });
+    summary.push({ category: 'Summary', itemName: 'Total Expenses', monthly: totalExpenses, total: totalExpenses * 12, isHeader: true, isExpenseTotal: true, type: 'summary' });
+    summary.push({ category: 'Summary', itemName: 'Net Savings', monthly: netSavings, total: netSavings * 12, isHeader: true, isSavings: true, type: 'summary' });
     return summary;
-  }, [salary, items, totalExpenses, netSavings]);
+  }, [items, currentSalaryFromStorage, totalIncomeForDisplay, totalExpenses, netSavings]);
 
-
-  // THE EXPORT FUNCTIONALITY
   const handleExportToExcel = () => {
-    // 1. Prepare data for Excel (array of objects or array of arrays)
-    // We'll use the budgetSummary data but format it slightly for export
-    const dataForExport = budgetSummary.map(row => ({
-      Category: row.category,
-      Item: row.item,
-      'Monthly Amount (INR)': row.monthly, // Numbers are fine for Excel
-      'Est. Yearly / Total (INR)': row.total
-    }));
-
-    // 2. Create a new worksheet
+    console.log("[BudgetExcelView] Exporting to Excel...");
+    const dataForExport = budgetSummaryForTable
+        .map(row => ({ // No filter, export all including salary from LS
+            Month: row.monthYear,
+            Category: row.category,
+            Item: row.itemName,
+            Type: row.type,
+            'Planned Monthly (INR)': row.monthly,
+            'Est. Yearly / Total (INR)': row.total
+        }));
+    if (dataForExport.length === 0) {
+        alert("No data available to export."); return;
+    }
     const ws = XLSX.utils.json_to_sheet(dataForExport);
-
-    // Optional: Adjust column widths
-    // This is a bit more complex, here's a basic example
-    const columnWidths = [
-        { wch: 25 }, // Category
-        { wch: 35 }, // Item
-        { wch: 20 }, // Monthly Amount
-        { wch: 25 }  // Yearly Amount
-    ];
+    const columnWidths = [ { wch: 15 }, { wch: 20 }, { wch: 30 }, {wch: 10}, { wch: 20 }, { wch: 25 } ];
     ws['!cols'] = columnWidths;
-
-    // 3. Create a new workbook
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Budget'); // 'Budget' is the sheet name
-
-    // 4. Generate Excel file and trigger download
+    XLSX.utils.book_append_sheet(wb, ws, 'Budget Overview');
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-
-    const fileName = `budget_overview_${new Date().toISOString().slice(0,10)}.xlsx`;
+    const fileName = `budget_overview_${getCurrentMonthYear()}.xlsx`;
     saveAs(dataBlob, fileName);
   };
 
+  if (isLoading && !currentUser?.id) { // Show initial loading or user not found
+     return <Card title="Budget Manager"><p>Loading user data or user not logged in...</p></Card>;
+  }
+  if (isLoading) { // Loading budget items
+     return <Card title="Budget Manager"><p className={styles.loadingMessage}>Loading budget data...</p></Card>;
+  }
+
+
   return (
-    <Card title="Monthly Budget Overview" actions={!isAdding && <Button onClick={() => setIsAdding(true)}>+ Add Item</Button>}>
-      {/* ... (your existing JSX for salary input and add item form) ... */}
+    <Card title="Budget Manager" actions={!formVisible && <Button onClick={openFormForAdd}>+ Add Budget Item</Button>}>
+      {error && <p className={styles.errorMessage}>{error}</p>}
       <div className={styles.controls}>
-        <Input
-          label="Your Gross Monthly Salary (INR):"
-          type="number"
-          value={salary}
-          onChange={(e) => setSalary(parseFloat(e.target.value) || 0)}
-          name="salary"
-        />
+        <label htmlFor="salaryFigure" className={styles.salaryLabel}>Your Gross Monthly Salary (INR):</label>
+        <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+            <Input
+            id="salaryFigure"
+            type="number"
+            value={salaryInputValue}
+            onChange={handleSalaryInputChange}
+            name="salaryFigure"
+            placeholder="Enter salary"
+            className={styles.salaryInput}
+            />
+            <Button onClick={handleSaveSalary} variant="secondary" className={styles.saveSalaryButton}>Save Salary</Button>
+        </div>
       </div>
 
-      {isAdding && (
-        <form onSubmit={handleAddItem} className={styles.addItemForm}>
-          <h4>Add New Budget Item</h4>
-          <div className={styles.formRow}>
-            <Input name="name" placeholder="Item Name (e.g., Rent, Netflix)" value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} required />
-            <Input name="monthlyAmount" type="number" placeholder="Monthly Amount" value={newItem.monthlyAmount} onChange={e => setNewItem({...newItem, monthlyAmount: e.target.value})} required />
-          </div>
-          <div className={styles.formRow}>
-            <div className={styles.inputGroup}>
-              <label htmlFor="category">Category</label>
-              <select id="category" name="category" value={newItem.category} onChange={e => setNewItem({...newItem, category: e.target.value})} className={styles.selectInput}>
-                <option value="Living Expenses">Living Expenses</option>
-                <option value="EMI">EMI / Loan</option>
-                <option value="Investment">Investment</option>
-                <option value="Subscription">Subscription</option>
-                <option value="Discretionary">Discretionary</option>
-                <option value="Other Expense">Other Expense</option>
-              </select>
-            </div>
-            <div className={styles.inputGroup}> {/* Placeholder for type if needed later */} </div>
-          </div>
-          <div className={styles.formActions}>
-            <Button type="submit">Add Item</Button>
-            <Button type="button" variant="secondary" onClick={() => setIsAdding(false)}>Cancel</Button>
-          </div>
-        </form>
-      )}
+      {formVisible && (
+           <form onSubmit={handleSubmitItem} className={styles.addItemForm}>
+             <h4>{editingItem ? 'Edit Budget Item' : 'Add New Budget Item'}</h4>
+             <div className={styles.formRow}>
+                <Input label="Month (YYYY-MM)" name="monthYear" type="month" value={formData.monthYear} onChange={handleFormInputChange} required />
+                <Input label="Item Name" name="itemName" placeholder="e.g., Rent, Mutual Fund" value={formData.itemName} onChange={handleFormInputChange} required />
+             </div>
+             <div className={styles.formRow}>
+                <Input label="Planned Amount" name="plannedAmount" type="number" step="0.01" placeholder="Monthly Amount" value={String(formData.plannedAmount)} onChange={handleFormInputChange} required />
+                <Input label="Actual Amount (Optional)" name="actualAmount" type="number" step="0.01" placeholder="Actual Spent/Received" value={String(formData.actualAmount)} onChange={handleFormInputChange} />
+             </div>
+             <div className={styles.formRow}>
+                <div className={styles.inputGroup}><label htmlFor="category">Category</label>
+                    <select id="category" name="category" value={formData.category} onChange={handleFormInputChange} className={styles.selectInput} required>
+                        <option value="">-- Select Category --</option>
+                        {/* Do NOT include "Salary" here if it's managed by the dedicated input */}
+                        <option value="Other Income">Other Income</option>
+                        <option value="Housing">Housing (Rent/Mortgage)</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Groceries">Groceries</option>
+                        <option value="EMI">EMI / Loan Payment</option>
+                        <option value="Investment">Investment/Savings</option>
+                        <option value="Insurance">Insurance</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Education">Education</option>
+                        <option value="Other Expense">Other Expense</option>
+                    </select>
+                </div>
+                <div className={styles.inputGroup}><label htmlFor="type">Type</label>
+                    <select id="type" name="type" value={formData.type} onChange={handleFormInputChange} className={styles.selectInput} required>
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option> {/* For "Other Income" */}
+                    </select>
+                </div>
+             </div>
+             <Input label="Notes (Optional)" name="notes" value={formData.notes || ''} onChange={handleFormInputChange} />
+             <div className={styles.formActions}>
+               <Button type="submit">{editingItem ? 'Save Changes' : 'Add Item'}</Button>
+               <Button type="button" variant="secondary" onClick={closeForm}>Cancel</Button>
+             </div>
+           </form>
+         )}
 
-      <div className={styles.tableContainer}>
+        <div className={styles.tableContainer}>
         <table className={styles.budgetTable}>
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Item</th>
-              <th>Monthly Amount</th>
-              <th>Est. Yearly / Total</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {budgetSummary.map((item, index) => (
-              <tr key={item.id || `summary-${index}`} className={`
-                ${item.isHeader && styles.headerRow}
-                ${item.category === 'Income' && styles.incomeRow}
-                ${item.isSavings && styles.savingsRow}
-                ${item.isExpenseTotal && styles.expenseTotalRow}
-              `}>
-                <td>{item.category}</td>
-                <td>{item.item}</td>
-                <td>{formatCurrency(item.monthly)}</td>
-                <td>{formatCurrency(item.total)}</td>
+            <thead>
+            <tr><th>Month</th><th>Category</th><th>Item Name</th><th>Type</th><th>Planned Amount</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+            {budgetSummaryForTable.map((item, index) => (
+                <tr key={item.id || `summary-${index}-${item.itemName}`}
+                    className={` ${item.isHeader && styles.headerRow} ${item.type === 'income' && !item.isHeader && styles.incomeRowActual} ${item.isPlaceholder && styles.placeholderRow} ${item.isSavings && styles.savingsRow} ${item.isExpenseTotal && styles.expenseTotalRow} ${item.isIncomeTotal && styles.incomeTotalRow} `}>
+                <td>{item.isHeader ? <b>{item.category}</b> : item.monthYear}</td>
+                <td>{item.isHeader ? '' : item.category}</td>
+                <td>{item.isHeader ? <b>{item.itemName}</b> : item.itemName}</td>
+                <td>{item.isHeader ? '' : item.type}</td>
+                <td className={styles.amountCell}>{formatCurrency(item.monthly)}</td>
                 <td>
-                  {!item.isHeader && item.id && (
-                    <Button onClick={() => handleRemoveItem(item.id)} variant="danger" className={styles.deleteButton}>✕</Button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {/* MODIFIED EXPORT BUTTON */}
-      <Button onClick={handleExportToExcel} className={styles.exportButton}>
-        Export to Excel
-      </Button>
+                    {!item.isHeader && !item.isLocalStorageSalary && item.id && ( // Don't show edit/delete for localStorage salary row
+                    <>
+                        <Button onClick={() => openFormForEdit(item)} variant="text" className={styles.actionButtonSmall} title="Edit">✎</Button>
+                        <Button onClick={() => handleRemoveItem(item.id)} variant="text" className={`${styles.actionButtonSmall} ${styles.deleteButton}`} title="Delete">✕</Button>
+                    </>
+                    )}
+                </td></tr>))}
+            </tbody></table>
+        </div>
+        {(items.length > 0 || currentSalaryFromStorage > 0) && <Button onClick={handleExportToExcel} className={styles.exportButton}>Export to Excel</Button>}
     </Card>
   );
 };

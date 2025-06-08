@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "postgres", 
-    "password": "3333",
-    "database": "finance_app_db",
+    "password": "123",
+    "database": "major",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },

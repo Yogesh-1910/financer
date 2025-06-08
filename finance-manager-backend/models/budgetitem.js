@@ -4,22 +4,15 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class BudgetItem extends Model {
     static associate(models) {
-      // Correct association back to User
-      BudgetItem.belongsTo(models.User, {
-        foreignKey: 'userId', // This foreign key must exist in the BudgetItems table
-        as: 'user'           // Alias
-      });
+      BudgetItem.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
     }
   }
   BudgetItem.init({
     userId: { // This defines the foreign key column
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Users', // Name of the table Users (Sequelize usually pluralizes)
-        key: 'id'       // Primary key of the Users table
-      },
-      onDelete: 'CASCADE' // Or 'SET NULL' if you want to keep budget items on user delete
+      references: { model: 'Users', key: 'id' }, // Table name 'Users'
+      onDelete: 'CASCADE'
     },
     monthYear: { type: DataTypes.STRING, allowNull: false },
     category: { type: DataTypes.STRING, allowNull: false },
@@ -30,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     notes: { type: DataTypes.TEXT, allowNull: true }
   }, {
     sequelize,
-    modelName: 'BudgetItem', // Table name will usually be 'BudgetItems'
+    modelName: 'BudgetItem', // Table name will be 'BudgetItems'
   });
   return BudgetItem;
 };

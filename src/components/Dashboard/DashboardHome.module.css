@@ -1,218 +1,323 @@
-/* src/components/Dashboard/DashboardHome.module.css */
+/* src/pages/DashboardPage.module.css */
 
-.dashboardHomeContainer {
+/* Global Loader Style (if used from DashboardPage.js for authLoading) */
+.fullPageLoader {
   display: flex;
-  flex-direction: column;
-  gap: 30px; /* Increased gap between cards */
-}
-
-.loadingContainer {
-  display: flex;
+  flex-direction: column; /* Allow text below spinner */
   justify-content: center;
   align-items: center;
-  min-height: 200px;
-  font-size: 1.2rem;
-  color: var(--dark-gray);
-}
-
-/* User Details Card Styling */
-.userDetailsCard {
-  /* The Card component itself provides base styling like padding and shadow */
-  /* We are styling the content within the card */
-}
-
-.profileHeader {
-  display: flex;
-  flex-direction: column; /* Stack avatar, text, button on small screens */
-  align-items: center;
+  min-height: 100vh;
+  font-size: 1.2rem; /* Adjusted size */
+  color: var(--text-color);
+  background-color: var(--background-color); /* Or your gradient if applied to body */
   text-align: center;
-  margin-bottom: 25px; /* Space below header section before details grid */
-  padding-bottom: 20px; /* Space before potential border */
-  border-bottom: 1px solid var(--border-color); /* Separator line */
+}
+.fullPageLoader::before { /* Simple spinner */
+  content: '';
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 20px;
+  border: 4px solid var(--medium-gray); /* Using one of the greys */
+  border-top-color: var(--primary-color); /* Your main green/action color */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.profileHeaderText {
-  margin-top: 15px; /* Space between avatar and text */
-  margin-bottom: 20px; /* Space between text and button */
+
+/* Main container for the dashboard home content */
+.dashboardHomeContainer {
+  /* Background is inherited from .main-content or body */
+  padding: 5px; /* Minimal padding, sections will have their own */
 }
 
-.userName {
-  margin-top: 0; /* Reset from avatar margin */
-  margin-bottom: 5px;
-  font-size: 1.8rem; /* Larger username */
-  color: var(--primary-color);
-  font-weight: 600;
-}
-
-.userGreeting { /* Replaces occupation display */
-  margin-top: 0;
-  font-size: 1rem;
-  color: var(--text-light);
-}
-
-.editProfileButtonLink button { /* Style the button within the link */
-  /* Button component styles will apply; can add specifics if needed */
-  padding: 8px 25px; /* Adjust button padding */
-}
-
-.profileDetailsGrid {
-  display: grid;
-  grid-template-columns: 1fr; /* Single column for details on small screens */
-  gap: 15px; /* Gap between detail items */
-}
-
-.detailItem {
-  background-color: #f8f9fa; /* Very light background for each detail item */
-  padding: 12px 18px; /* Generous padding */
-  border-radius: 6px;
-  border: 1px solid #eef2f5; /* Softer border than main card border */
+/* Header section for "Welcome back" and Date */
+.dashboardHeader {
   display: flex;
-  flex-direction: column; /* Stack label and value by default */
+  justify-content: space-between;
+  align-items: flex-start; /* Align items to the top of their container */
+  margin-bottom: 30px; /* Space below header */
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color-dark-theme); /* Subtle separator */
 }
 
-.detailLabel {
-  font-weight: 500; /* Slightly less bold */
-  color: var(--secondary-color);
-  margin-bottom: 4px;
-  font-size: 0.8rem; /* Smaller label */
+.welcomeSection h1 {
+  font-size: 2rem; /* Or even 2.2rem for more impact */
+  font-weight: 600; /* Semibold */
+  color: var(--text-color);
+  margin-top: 0;
+  margin-bottom: 8px; /* Space between heading and subheading */
+}
+
+.welcomeSection p {
+  font-size: 1rem; /* Or 0.95rem */
+  color: var(--text-secondary-dark-theme); /* Lighter grey for subheading */
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.dateDisplay {
+  font-size: 0.9rem;
+  color: var(--text-secondary-dark-theme);
+  text-align: right;
+  line-height: 1.4;
+  padding-top: 5px; /* Align better with "Welcome back" text */
+}
+.dateDisplay span {
+  font-size: 1.2rem; /* Larger date */
+  font-weight: 500; /* Medium weight */
+  color: var(--text-color);
+  display: block; /* Make date part appear on next line */
+}
+
+/* Grid for Summary Cards (KPIs) */
+.summaryCardsGrid {
+  display: grid;
+  /* Make it more responsive: 1 col on very small, then 2, then up to 5 */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+  gap: 20px; /* Space between cards */
+  margin-bottom: 35px; /* Space below summary cards section */
+}
+
+.summaryCard {
+  background-color: var(--surface-color); /* Dark card background e.g., #1A202C */
+  padding: 20px;
+  border-radius: 12px; /* Rounded corners from reference */
+  display: flex;
+  align-items: center; /* Vertically align icon and text content block */
+  gap: 18px; /* Space between icon wrapper and content */
+  border: 1px solid var(--border-color-dark-theme); /* Subtle border */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Slightly softer shadow */
+  position: relative; /* For positioning the change percentage */
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.summaryCard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+
+.summaryCardIconWrapper {
+  padding: 12px; /* Slightly more padding */
+  border-radius: 10px; /* Matched reference image's rounded square */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem; /* Icon size (react-icons will scale) */
+  color: #fff; /* White icon color by default */
+  width: 48px;  /* Fixed width */
+  height: 48px; /* Fixed height */
+  flex-shrink: 0; /* Prevent icon wrapper from shrinking */
+}
+
+.summaryCardContent {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allow content to take remaining space */
+  justify-content: center; /* Center title and value vertically if icon is large */
+}
+
+.summaryCardTitle {
+  font-size: 0.8rem; /* Smaller title text */
+  color: var(--text-secondary-dark-theme);
   text-transform: uppercase;
+  margin-bottom: 4px; /* Space between title and value */
+  font-weight: 500; /* Medium weight */
   letter-spacing: 0.5px;
 }
 
-.detailValue {
+.summaryCardValue {
+  font-size: 1.8rem; /* Large value */
+  font-weight: 600; /* Semibold */
   color: var(--text-color);
-  font-size: 1rem; /* Clear value text */
-  font-weight: 400;
-  word-break: break-word;
+  line-height: 1.1; /* Tighten line height for large font */
 }
 
-/* Responsive adjustments for medium screens and up */
-@media (min-width: 768px) {
-  .profileHeader {
-    flex-direction: row; /* Avatar, text, button side-by-side */
-    text-align: left;
-    align-items: center; /* Vertically align items in the header */
-  }
-  .profileHeaderText {
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 20px; /* Space between avatar and text */
-    flex-grow: 1; /* Allow text to take available space */
-  }
-  .editProfileButtonLink {
-    margin-left: auto; /* Push button to the right */
-    flex-shrink: 0; /* Prevent button from shrinking */
-  }
+.summaryCardChange {
+  position: absolute;
+  top: 12px; /* Adjust positioning */
+  right: 12px;
+  font-size: 0.75rem; /* Smaller percentage text */
+  font-weight: 500;
+  padding: 4px 8px; /* Padding for the pill */
+  border-radius: 12px; /* Pill shape */
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Space between icon and text in change indicator */
+}
+.summaryCardChange svg { /* Target react-icons SVG within change indicator */
+    font-size: 0.9em; /* Make trend icon slightly smaller than text */
+}
 
-  .profileDetailsGrid {
-    grid-template-columns: repeat(2, 1fr); /* Two columns for details */
-    gap: 18px 25px; /* row-gap column-gap */
-  }
-  /* If you want some items to span full width in the 2-column grid:
-  .detailItem.full-width {
-    grid-column: 1 / -1;
-  }
-  */
+.positiveChange {
+  color: var(--ref-green, var(--success-color)); /* Use ref-green or fallback */
+  background-color: rgba(56, 161, 105, 0.15); /* Slightly more visible background */
+}
+.negativeChange {
+  color: var(--ref-red, var(--danger-color));
+  background-color: rgba(229, 62, 62, 0.15);
+}
+.neutralChange {
+  color: var(--ref-blue, var(--secondary-color-dark-theme));
+  background-color: rgba(49, 130, 206, 0.15);
+}
+
+/* Lower Dashboard Grid (Recent Transactions, Quick Actions, etc.) */
+.lowerDashboardGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); /* Transactions take more space, minmax for responsiveness */
+    gap: 25px; /* Increased gap */
+    margin-top: 35px;
+}
+
+@media (max-width: 992px) { /* Tablet and smaller */
+    .lowerDashboardGrid {
+        grid-template-columns: 1fr; /* Stack on smaller screens */
+    }
+}
+
+/* Card styles for these sections are inherited from UI/Card.module.css */
+/* You can add specific class names if you need to override Card styles */
+.transactionsCard, .quickActionsCard, .upcomingBillsCard {
+    /* Example: if you need more padding inside these specific cards */
+    /* padding: 25px; */
+}
+
+.sidebarWidgets {
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* Space between Quick Actions and Upcoming Bills */
+}
+
+.transactionItem, .billItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0; /* Increased padding */
+    border-bottom: 1px solid var(--border-color-dark-theme);
+    font-size: 0.9rem;
+}
+.transactionItem:first-child, .billItem:first-child {
+    padding-top: 0; /* Remove top padding for first item in list */
+}
+.transactionItem:last-child, .billItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0; /* Remove bottom padding for last item */
+}
+.transactionItem span:first-child, .billItem span:first-child { /* Item name */
+    color: var(--text-color);
+    font-weight: 500;
+}
+.positiveAmount { color: var(--ref-green, var(--success-color)); font-weight: 500; }
+.negativeAmount { color: var(--ref-red, var(--danger-color)); font-weight: 500; }
+.billAmount { font-weight: 500; color: var(--text-color); }
+.billItem span:nth-child(2) { /* Due date text */
+    color: var(--text-secondary-dark-theme);
+    font-size: 0.85rem;
 }
 
 
-/* --- News Card Styling (remains largely the same from previous version) --- */
+.quickActionButton {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space for icon if you add one */
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.2s ease;
+    color: #fff; /* White text on colored buttons */
+}
+.quickActionButton:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+.quickActionButton:last-child { margin-bottom: 0; }
+
+.actionIncome { background-color: var(--ref-green, var(--success-color)); }
+.actionExpense { background-color: var(--ref-red, var(--danger-color)); }
+.actionGoal { background-color: var(--ref-blue, var(--secondary-color-dark-theme)); }
+
+
+/* News Card (if you keep it) - basic styling from your reference */
 .newsCard {
-  /* ... */
+  margin-top: 35px;
+  /* Card uses --surface-color */
+}
+.newsCard .cardTitle { /* Assuming your Card component uses .cardTitle for its title */
+    color: var(--primary-color) !important; /* Make news title green */
 }
 
 .newsList {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 550px;
-  overflow-y: auto;
 }
 
 .newsItem {
-  background-color: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 15px;
-  margin-bottom: 12px;
-  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  display: flex;
+  gap: 15px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border-color-dark-theme);
 }
-.newsItem:hover {
-  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-  transform: translateY(-2px);
+.newsItem:first-child {
+    padding-top: 0;
 }
 .newsItem:last-child {
-  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
-.newsLink {
-  text-decoration: none;
-  color: var(--text-color);
-  display: block;
+.newsImage { /* Assuming you have an image element */
+  width: 100px; /* Or adjust as needed */
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
 }
-.newsLink:hover .newsTitle {
-  color: var(--primary-color);
+
+.newsContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Better vertical alignment */
 }
 
 .newsTitle {
-  margin: 0 0 6px 0;
-  font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1.35;
-}
-
-.newsMeta {
-  font-size: 0.75rem;
-  color: var(--text-light);
-  margin-bottom: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px 10px;
-  align-items: center;
-}
-.newsSource {
-  font-weight: 500;
-  color: var(--secondary-color);
-}
-.newsDate { /* No specific style needed */ }
-
-.newsDescription {
-  font-size: 0.875rem;
-  color: var(--text-color);
-  line-height: 1.5;
-  margin-top: 5px;
-}
-
-.loadingText, .errorText {
-  text-align: center;
-  padding: 25px 20px;
-  font-size: 0.95rem;
-  color: var(--dark-gray);
-}
-.errorText {
-  color: var(--danger-color);
-  background-color: rgba(220,53,69,0.05);
-  border: 1px solid rgba(220,53,69,0.1);
-  border-radius: 6px;
-}
-.errorText small {
-  display: block;
-  margin-top: 10px;
-  font-size: 0.8rem;
-}
-
-.moreNewsLink {
-  display: block;
-  text-align: right;
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px solid var(--border-color);
-  font-size: 0.9rem;
-  color: var(--secondary-color);
-  font-weight: bold;
+  font-size: 1rem; /* Slightly larger for readability */
+  font-weight: 500; /* Medium weight */
+  color: var(--text-color); /* Main text color for title */
   text-decoration: none;
+  margin-bottom: 5px;
+  line-height: 1.3;
 }
-.moreNewsLink:hover {
+.newsTitle:hover {
+  color: var(--primary-color); /* Green on hover */
   text-decoration: underline;
-  color: var(--primary-color);
+}
+
+.newsDescription { /* Not present in your reference image, but good to have */
+  font-size: 0.85rem;
+  color: var(--text-secondary-dark-theme);
+  margin-bottom: 8px;
+  line-height: 1.4;
+  /* For text truncation if desired:
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  */
+}
+
+.newsSource { /* Source and date */
+  font-size: 0.75rem;
+  color: var(--text-secondary-dark-theme);
+  margin-top: auto; /* Pushes to bottom */
 }

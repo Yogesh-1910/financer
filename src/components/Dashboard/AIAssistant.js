@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { MdMic, MdSend, MdStopCircle } from 'react-icons/md';
 import Card from '../UI/Card';
 import Input from '../UI/Input';
 import Button from '../UI/Button';
@@ -100,7 +101,7 @@ const AIAssistant = () => {
       {voiceError && <p className={styles.voiceErrorMessage}>{voiceError}</p>}
       <div className={styles.inputArea}>
         <Input
-          ref={inputRef} // Assign ref
+          ref={inputRef}
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
@@ -109,11 +110,22 @@ const AIAssistant = () => {
           name="ai-input"
           disabled={isLoading}
         />
-        <Button onClick={() => handleSend()} disabled={isLoading || !inputText.trim()} className={styles.sendButton} title="Send Message">
-          ➤
+        <Button 
+          onClick={() => handleSend()} 
+          disabled={isLoading || !inputText.trim()} 
+          className={styles.sendButton} 
+          title="Send Message"
+          variant="primary" // Assuming green is primary
+        >
+          <MdSend /> {/* Using MdSend icon */}
         </Button>
-        <Button onClick={handleVoiceInput} variant={isListening ? "danger" : "secondary"} className={styles.voiceButton} title={isListening ? "Stop Listening" : "Use Voice Input"}>
-          {isListening ? <span className={styles.listeningPulse}></span> : '🎤'}
+        <Button 
+          onClick={handleVoiceInput} 
+          variant={isListening ? "danger" : "secondary"} // Red when listening, blue/grey otherwise
+          className={styles.voiceButton} 
+          title={isListening ? "Stop Listening" : "Use Voice Input"}
+        >
+          {isListening ? <MdStopCircle /> : <MdMic />} {/* Using MdMic or MdStopCircle icon */}
         </Button>
       </div>
       <div className={styles.chatOptions}>

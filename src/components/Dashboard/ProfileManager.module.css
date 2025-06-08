@@ -1,63 +1,52 @@
-/* src/components/Dashboard/ProfileManager.module.css */
-
-/* Styles for the form when isEditing is true */
 .profileForm {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 5px; /* Gap between input groups */
+    gap: 10px; /* Increased gap between input groups for better spacing */
 }
 
-.profileForm .inputGroup { /* Target the div wrapper from Input.js */
-    margin-bottom: 10px; /* Reduce bottom margin for tighter layout */
+/* The Input component's wrapper div (from UI/Input.js) */
+/* No specific styles needed here if Input.module.css handles individual input group margin */
+.profileForm .inputGroup {
+    margin-bottom: 12px; /* Consistent spacing */
 }
 
-/* Styles for the display mode when isEditing is false */
-.profileDisplay {
+/* --- Styles for DISPLAY MODE (when isEditing is false) --- */
+/* If you are using the ProfileManager.js version that has a separate .profileDisplay div
+   and uses spans for display, you'd style .profileDisplay, .displayField, etc. here.
+   However, if you are using the version where <Input> components are simply disabled
+   when not editing, then their appearance will be controlled by the :disabled state
+   in Input.module.css.
+*/
+.profileDisplay { /* This class is used if you conditionally render text spans */
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Space between display fields */
+    gap: 15px;
 }
-
 .displayField {
     display: flex;
-    flex-direction: column; /* Label above value */
-    padding: 8px 0;
-    /* border-bottom: 1px solid var(--light-gray); Remove if too busy */
+    flex-direction: column;
+    padding-bottom: 8px; /* Add some padding or a border if you like */
+    /* border-bottom: 1px solid var(--border-color-dark-theme); */
 }
-/* Alternatively, label and value side-by-side:
-.displayField {
-    display: grid;
-    grid-template-columns: 150px 1fr; // Adjust label width as needed
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--light-gray);
-}
-.displayField:last-of-type {
-    border-bottom: none;
-}
-*/
-
-
 .displayLabel {
-    font-weight: bold;
-    color: var(--dark-gray);
-    font-size: 0.9rem;
-    margin-bottom: 4px; /* If label is above value */
+    font-weight: 500;
+    color: var(--text-secondary-dark-theme);
+    font-size: 0.85rem;
+    margin-bottom: 5px;
 }
-
-.displayValue {
-    font-size: 1rem;
+.displayValue { /* This is for the <span> version if not using disabled inputs */
+    font-size: 0.95rem;
     color: var(--text-color);
-    padding: 10px; /* Mimic input padding for consistent look */
-    background-color: #f8f9fa; /* Light background to show it's a value area */
-    border: 1px solid #e9ecef; /* Subtle border */
-    border-radius: 5px; /* Match input radius */
-    min-height: 21px; /* Match input min-height approx (padding + line-height) */
+    padding: 10px 12px; /* Match input padding */
+    background-color: #000000; /* Black background */
+    border: 2px solid var(--primary-color); /* Green border */
+    border-radius: 6px;
+    min-height: calc(0.95rem + 20px + 4px); /* Approx height of input */
     word-break: break-word;
 }
 
 
-/* Common Message Styles */
+/* Message Styling (Success/Error) */
 .message {
   padding: 10px 15px;
   border-radius: 4px;
@@ -66,24 +55,20 @@
   text-align: center;
 }
 .successMessage {
-  color: var(--success-color);
-  background-color: rgba(40,167,69,0.1);
-  border: 1px solid rgba(40,167,69,0.2);
+  color: var(--success-color); /* Green text */
+  background-color: rgba(var(--success-rgb, 0, 179, 134), 0.15); /* Light green background (assuming --success-rgb) */
+  border: 1px solid rgba(var(--success-rgb, 0, 179, 134), 0.3);
 }
 .errorMessage {
-  color: var(--danger-color);
-  background-color: rgba(220,53,69,0.1);
-  border: 1px solid rgba(220,53,69,0.2);
+  color: var(--danger-color); /* Red text */
+  background-color: rgba(var(--danger-rgb, 255, 82, 82), 0.15); /* Light red background (assuming --danger-rgb) */
+  border: 1px solid rgba(var(--danger-rgb, 255, 82, 82), 0.3);
 }
 
-/* Common Button Group Styles */
+/* Button Group Styling */
 .buttonGroup {
   display: flex;
   gap: 15px;
-  margin-top: 20px;
+  margin-top: 25px; /* More space above buttons */
   justify-content: flex-start;
-}
-
-.buttonGroup button { /* This targets buttons directly within the group */
-  padding: 10px 20px;
 }

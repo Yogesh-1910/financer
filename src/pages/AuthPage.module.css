@@ -1,17 +1,61 @@
+/* src/pages/AuthPage.module.css */
+
 .authPageContainer {
-  display: flex;
-  flex-direction: column;
+  position: relative; /* Establishes a stacking context for children */
+  width: 100vw;
+  min-height: 100vh;
+  display: flex; /* For centering the .formWrapper */
+  flex-direction: column; /* If you have an appName above the form */
   align-items: center;
   justify-content: center;
-  min-height: 90vh; /* Takes most of the viewport height */
-  padding: 20px;
-  background-color: #f4f7f6; /* Match body background */
+  padding: 20px; /* Give some space from viewport edges */
+  box-sizing: border-box;
+  overflow: hidden; /* VERY IMPORTANT: Prevents scrollbars if video overflows */
+  
+  /* Fallback background if video doesn't load */
+  background-color: var(--background-color, #0D121C); 
 }
 
+.backgroundVideo {
+  position: absolute; /* Positioned relative to .authPageContainer */
+  top: 50%;
+  left: 50%;
+  min-width: 100%;   /* Force it to cover the container width */
+  min-height: 100%;  /* Force it to cover the container height */
+  width: auto;       /* Maintain aspect ratio */
+  height: auto;      /* Maintain aspect ratio */
+  object-fit: cover; /* Scale video to maintain aspect ratio while filling the element's entire content box. Will be clipped to fit. */
+  transform: translate(-50%, -50%); /* Center the video element */
+  z-index: 1;        /* Layer 1: Video at the very back */
+  /* Optional: filter to darken the video slightly for better text contrast */
+  /* filter: brightness(0.7); */
+}
+
+.videoOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay. Adjust opacity (0.0 to 1.0) */
+  z-index: 2;        /* Layer 2: Overlay sits on top of the video */
+}
+
+.formWrapper {
+  position: relative; /* To ensure it respects z-index and sits on top */
+  z-index: 3;        /* Layer 3: Form content on top of video and overlay */
+  width: 100%;       /* Allow it to be centered by the parent's flex properties */
+  max-width: 400px;  /* Control the maximum width of the login form box */
+  /* The LoginForm component itself will have its own padding and background */
+}
+
+/* Optional: If you have an appName heading */
 .appName {
-    font-size: 2.5rem;
-    color: var(--primary-color);
-    margin-bottom: 30px;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  font-size: 2.5rem;
+  color: var(--primary-color, #00b386);
+  margin-bottom: 25px;
+  font-weight: 700;
+  text-shadow: 0px 1px 4px rgba(0,0,0,0.7); /* For readability over video */
+  position: relative; /* To sit above overlay */
+  z-index: 3;
 }

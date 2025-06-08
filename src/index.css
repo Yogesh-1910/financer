@@ -1,60 +1,90 @@
-/* src/index.css */
 body {
   margin: 0;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif; /* Added Roboto as a suggestion, ensure you import it or use a preferred sans-serif */
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f0f4f8; /* Lighter, cooler background */
-  color: #333a45; /* Darker text for better contrast */
-}
 
-/* Import Roboto font from Google Fonts (add to your public/index.html <head>)
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-*/
+  /* GRADIENT BACKGROUND */
+  background-color: var(--gradient-dark-start); /* Fallback color */
+  background-image: linear-gradient(
+    180deg, /* Top to Bottom */
+    var(--gradient-dark-start) 0%, 
+    var(--gradient-dark-mid) 40%, /* Mid color appears sooner */
+    var(--gradient-dark-end) 100%
+  );
+  min-height: 100vh;
+  background-attachment: fixed; /* Optional: keeps gradient static on scroll */
+
+  color: var(--text-color); /* Your light text color for dark theme */
+}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
+/* CSS Variables - DARK THEME (including gradient vars) */
 :root {
-  --primary-color: #1A374D; /* Deep Blue */
-  --secondary-color: #406882; /* Muted Blue/Grey */
-  --accent-color: #B1D0E0; /* Light Blue Accent / or a Gold: #D4AF37 */
-  --success-color: #28a745; /* Keep green for success */
-  --danger-color: #dc3545;   /* Keep red for danger */
+  /* --- Gradient Colors (Choose one set or customize) --- */
+  /* Option 1: Dark Blue/Navyish Gradient */
+  /* --gradient-dark-start: #0b0f18;  
+     --gradient-dark-mid: #121a2a;    
+     --gradient-dark-end: #0b0f18;     */
+
+  /* Option 2: Dark Desaturated Teal/Greenish Gradient (closer to image) */
+  --gradient-dark-start: #0a141f;  /* Darker, slightly blueish teal */
+  --gradient-dark-mid: #102027;    /* Mid, slightly blueish teal */
+  --gradient-dark-end: #0a141f;    /* Darker, slightly blueish teal */
+
+
+  /* --- Core Dark Theme Colors --- */
+  --background-color: var(--gradient-dark-start); /* Main background will use gradient start as solid fallback */
+  --surface-color: #1c2532;         /* Slightly lighter dark grey/blue for cards, modals, inputs, needs to contrast with gradient */
   
-  --background-color: #ffffff; /* Card backgrounds, etc. */
-  --content-background: #f0f4f8; /* Main content area background */
-  --text-color: #333a45;
-  --text-light: #5f6773;
-  --border-color: #dde2e7; /* Softer border color */
+  --text-color: #EAEAEA;            /* Primary Text: Very Light Grey */
+  --text-secondary-dark-theme: #a0b0c0; /* Secondary Text: Lighter Grey/Blueish for less emphasis */
+  
+  --border-color-dark-theme: #2c3a47; /* Borders: Darker Grey/Blueish, subtle */
 
-  --sidebar-bg: #232f3e; /* Darker sidebar */
-  --sidebar-text: #c5cdd3;
-  --sidebar-text-hover: #ffffff;
-  --sidebar-active-bg: var(--primary-color); /* Or var(--accent-color) with dark text */
-  --sidebar-active-indicator: var(--accent-color); /* A bright accent like gold or light blue */
+  /* --- Action & Status Colors (Dark Theme Adapted) --- */
+  --primary-color: #00b386;         /* Finance Green as the primary action/theme color */
+  --text-on-primary: #FFFFFF;
+  
+  --secondary-color-dark-theme: #007bff; /* A contrasting blue for secondary actions */
+  --text-on-secondary-dark-theme: #FFFFFF;
 
-  --header-height: 60px; /* Define a fixed header height */
+  --success-color: var(--primary-color); /* Use primary green for success */
+  --text-on-success: #FFFFFF;
+
+  --danger-color: #FF5252;          /* Brighter Red for errors on dark background */
+  --text-on-danger: #FFFFFF;
+  
+  --accent-color: #00b386;         /* Green can be the main accent */
+
+
+  /* --- Mapping to Old Variable Names (if still used) --- */
+  --secondary-color: var(--secondary-color-dark-theme);
+  --light-gray: var(--border-color-dark-theme);
+  --medium-gray: #455a64; /* A mid-dark grey/blue */
+  --dark-gray: var(--text-secondary-dark-theme);
+  --card-background-dark-theme: var(--surface-color);
 }
 
-/* Basic scrollbar styling */
+
+/* Basic scrollbar styling for Dark Theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #e7eaec;
+  background: rgba(0,0,0,0.2); /* Semi-transparent track over gradient */
 }
 ::-webkit-scrollbar-thumb {
-  background: #bfc6ce;
+  background: var(--medium-gray);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8b1ba;
+  background: var(--text-secondary-dark-theme);
 }
