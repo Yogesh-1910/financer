@@ -1,63 +1,83 @@
 // src/components/Layout/Navbar.js
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'; // Removed useState, useEffect
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import UserAvatar from './UserAvatar'; // Assuming this component exists and is styled
+import Button from '../UI/Button';
 import styles from './Navbar.module.css';
 
-// Import icons for menu toggle
-import { MdMenu, MdClose } from 'react-icons/md';
+// Construct base URL for images, removing '/api' if present from REACT_APP_API_URL
+const API_BASE_URL_ENV_NAV = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+const IMAGE_SERVER_URL_NAV = API_BASE_URL_ENV_NAV.endsWith('/api')
+                           ? API_BASE_URL_ENV_NAV.substring(0, API_BASE_URL_ENV_NAV.length - '/api'.length)
+                           : API_BASE_URL_ENV_NAV;
+
+const DEFAULT_NAV_PLACEHOLDER_INITIAL = '?'; // Fallback character if no name/username
 
 const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
-  const { currentUser } = useAuth();
-  const [isMobileViewForMenu, setIsMobileViewForMenu] = useState(window.innerWidth <= 992); // Threshold for mobile menu icon logic
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileViewForMenu(window.innerWidth <= 992);
-    };
-    window.addEventListener('resize', handleResize);
-    // Initial check
-    handleResize();
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
-  // Determine which icon to show for the menu button
-  // On mobile, it changes based on sidebar state. On desktop, it might always be the hamburger.
-  // Your previous logic: isSidebarOpen && window.innerWidth <= 992 ? '✕' : '☰'
-  // Let's refine this: if it's mobile, toggle. If desktop, always show hamburger (or base it on isSidebarOpen if desktop sidebar can also fully collapse/disappear).
-  // For simplicity, let's keep the toggle visible on desktop too if the sidebar can be fully hidden/shown by it.
-  const menuIconToDisplay = isSidebarOpen ? <MdClose /> : <MdMenu />;
+  let navProfileDisplay;
+  if (currentUser) {
+    const profilePicSrc = currentUser.profilePicUrl
+                        ? `${IMAGE_SERVER_URL_NAV}${currentUser.profilePicUrl}?t=${new Date().getTime()}` // Cache buster
+                        : null;
+
+    const userInitial = currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase()
+                      : currentUser.username ? currentUser.username.charAt(0).toUpperCase()
+                      : DEFAULT_NAV_PLACEHOLDER_INITIAL;
+
+    if (profilePicSrc) {
+      navProfileDisplay = (
+        <img
+            src={profilePicSrc}
+            alt="User"
+            className={styles.navProfilePic}
+            // Simple onError to hide if truly broken, CSS background can show placeholder
+            onError={(e) => { e.target.style.display = 'none'; /* Hide broken img */
+                              // Find sibling .navProfileInitial and display it (more complex)
+                              // For simplicity, CSS can handle a background on .navProfileLink
+                           }}
+        />
+      );
+    } else {
+      navProfileDisplay = (
+        <div className={styles.navProfileInitial}>{userInitial}</div>
+      );
+    }
+  }
+
 
   return (
-    <header className={styles.navbar}>
+    <nav className={styles.navbar}>
       <div className={styles.navLeft}>
-        <button onClick={toggleSidebar} className={styles.menuButton} aria-label={isSidebarOpen ? "Close menu" : "Open menu"}>
-          {menuIconToDisplay}
-        </button>
-        <Link to="/dashboard" className={styles.brand}>
-          Financier
-        </Link>
+        <Button onClick={toggleSidebar} variant="text" className={styles.menuButton}>
+          {isSidebarOpen ? '✕' : '☰'}
+        </Button>
+        <Link to="/dashboard" className={styles.brand}>Financier</Link>
       </div>
-
       <div className={styles.navRight}>
         {currentUser ? (
-          // This Link is the element that gets the black background on hover
-          <Link to="/dashboard/profile" className={styles.profileLinkContainer} title={`View profile for ${currentUser.username}`}>
-            <span className={styles.usernameNav}>{currentUser.username}</span>
-            <UserAvatar user={currentUser} size={30} /> {/* Consistent size */}
-          </Link>
+          <>
+            <span className={styles.welcomeMessage}>Hi, {currentUser.fullName || currentUser.username}!</span>
+            <Link to="/dashboard/profile" className={styles.navProfileLink} title="View Profile">
+              {navProfileDisplay}
+            </Link>
+            <Button onClick={handleLogout} variant="danger" className={styles.logoutButton}>Logout</Button>
+          </>
         ) : (
           <>
-            {/* Login/Signup buttons would go here if user is not logged in,
-                but your screenshot shows them for an authenticated user.
-                Assuming these are handled elsewhere or not needed when logged in. */}
+            <Link to="/login" className={styles.navLink}><Button variant="secondary">Login</Button></Link>
+            <Link to="/signup" className={styles.navLink}><Button variant="primary">Sign Up</Button></Link>
           </>
         )}
-        {/* Logout button is in Sidebar in your current design */}
       </div>
-    </header>
+    </nav>
   );
 };
-
 export default Navbar;

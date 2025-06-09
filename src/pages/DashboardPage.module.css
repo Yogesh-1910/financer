@@ -1,132 +1,177 @@
 /* src/pages/DashboardPage.module.css */
 
-.dashboardHome { /* Renamed to avoid conflict with DashboardHome component name, if you used that for container before */
+/* Layout for the entire dashboard page (Navbar + Sidebar + Main Content) */
+.dashboardPageLayout {
+    display: flex;
+    flex-direction: column; /* Navbar on top */
+    min-height: 100vh;
+}
+
+.dashboardContainer { /* Container for Sidebar + Main Content */
+    display: flex;
+    flex: 1; /* Takes up remaining vertical space */
+}
+
+.mainDashboardContent {
+    flex-grow: 1;
+    padding: 20px 25px;
+    margin-left: 250px; /* Default width of open sidebar */
+    transition: margin-left 0.3s ease-in-out;
+    background-color: #203754; /* A light background for the content area */
+    overflow-y: auto; /* Allow content to scroll if it's too long */
+}
+
+.mainContentOpen { /* Explicit class if needed, though default margin-left handles it */
+    margin-left: 250px;
+}
+.mainContentCollapsed { /* When sidebar is collapsed on desktop */
+    margin-left: 60px; /* Adjust to your collapsed sidebar width */
+}
+
+@media (max-width: 768px) {
+    .mainDashboardContent {
+        margin-left: 0 !important; /* Sidebar overlays on mobile, no margin needed */
+        padding: 15px;
+    }
+}
+
+
+/* Styles for DashboardHome content specifically */
+.dashboardHome {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 25px; /* Space between profile card and news card */
 }
 
-/* Profile Summary Card (Welcome Section) - Assuming this is the top "Welcome back" card */
+/* Profile Summary Card within DashboardHome */
 .profileSummaryCard {
-  /* This likely uses styles from UI/Card.module.css. 
-     If it has its own distinct background that needs to be dark, adjust it here or in Card.module.css.
-     For now, assuming it inherits dark theme from Card or body. */
+  /* Base styles from UI/Card.module.css will apply */
+  /* Add specific overrides here if needed for this card */
 }
 
-.profileHeader { /* For "Welcome back, danush!" and image */
+.profileHeader {
   display: flex;
   align-items: center;
   gap: 20px;
   margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--light-gray);
 }
 
-.profilePic {
+.profilePicDashboard {
   width: 80px;
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  /* Profile pic border uses --primary-color, which should now be your green */
-  border: 3px solid var(--primary-color); 
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* This shadow might be less visible on dark, adjust if needed */
+  object-position: center;
+  border: 3px solid var(--primary-color);
+  background-color: var(--light-gray); /* Fallback */
+  flex-shrink: 0;
 }
 
-.profileInfo h2 { /* "Welcome back, danush!" */
+.initialsFallbackDashboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 2.5rem; /* For 80px container */
+  color: white;
+  background-color: var(--secondary-color); /* Match Navbar or choose another */
+  /* width, height, border-radius are inherited if applied to the same element as .profilePicDashboard */
+}
+
+.profileInfo h2 {
   margin-top: 0;
   margin-bottom: 5px;
   font-size: 1.8rem;
-  color: var(--text-color); /* Should be white/light grey from your dark theme index.css */
+  color: var(--text-color);
+  font-weight: 600;
 }
-.profileInfo p { /* "Here's a quick overview..." */
+.profileInfo p {
   margin: 0;
   font-size: 1rem;
-  color: var(--dark-gray); /* Should be your lighter grey for secondary text from index.css */
+  color: var(--dark-gray);
 }
 
-/* Grid for Financial Summary Boxes */
+/* Financial Summary Boxes */
 .financialSummaryGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 20px;
+  margin-top: 10px; /* Space from profile header */
 }
 
-/* --- UPDATED .summaryBox Styles --- */
 .summaryBox {
-  background-color: #000000; /* NEW: Black background */
-  color: #FFFFFF;             /* NEW: White text for content inside */
-  padding: 15px;
+  background-color: #ffffff; /* White background for boxes */
+  padding: 18px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 15px;
-  /* border-left: 4px solid var(--primary-color); /* Old left border - removing for full border */
-  border: 2px solid var(--primary-color); /* NEW: Green border all around */
-  box-shadow: 0 2px 5px rgba(0, 179, 134, 0.1); /* Optional: Subtle green glow or darker shadow */
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  border: 1px solid #e0e0e0; /* Softer border */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.summaryBox:hover { /* Optional hover */
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 179, 134, 0.2);
+.summaryBox:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
-/* Removing .summaryBox.red and .summaryBox.green as the border is now always green */
-/* If you need different border colors for specific boxes, you can add them back */
+
+.summaryBox.red { border-left: 4px solid var(--danger-color); }
+.summaryBox.green { border-left: 4px solid var(--success-color); }
+.summaryBox.neutral { border-left: 4px solid var(--medium-gray); }
 
 
 .summaryIcon {
-  font-size: 1.8rem; /* Slightly smaller to fit better with new design */
-  padding: 8px;
-  border-radius: 50%; /* Circular background for icon */
+  font-size: 1.8rem; /* Slightly smaller icon for these boxes */
+  padding: 10px;
+  border-radius: 50%;
+  background-color: var(--light-gray); /* Light background for icon circle */
+  color: var(--primary-color); /* Icon color */
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  /* Icon background and color: */
-  /* Option 1: Green background, black icon (like your reference for Loan tracker) */
-  background-color: var(--primary-color); /* Green background */
-  color: #000000; /* Black icon for contrast on green */
-  /* Option 2: Transparent background, icon inherits card's white text color or is green */
-  /* background-color: transparent; */
-  /* color: var(--text-color); /* White icon */
-  /* color: var(--primary-color); /* Or Green icon */
+  width: 45px; /* Icon circle size */
+  height: 45px; /* Icon circle size */
+  flex-shrink: 0;
 }
+.summaryBox.red .summaryIcon { color: var(--danger-color); }
+.summaryBox.green .summaryIcon { color: var(--success-color); }
+.summaryBox.neutral .summaryIcon { color: var(--dark-gray); }
 
-.summaryText h4 { /* Title like "MONTHLY INCOME" */
-  margin: 0 0 5px 0;
-  font-size: 0.8rem; /* Slightly smaller for this design */
-  color: #FFFFFF;     /* NEW: White text */
-  opacity: 0.8;        /* Make it slightly less prominent than the value */
+
+.summaryText h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
   text-transform: uppercase;
   font-weight: 500;
+  white-space: nowrap;
 }
-.summaryText p { /* Value like "₹75,000" */
+.summaryText p {
   margin: 0;
-  font-size: 1.5rem; /* Larger value */
-  font-weight: bold;
-  color: #FFFFFF;     /* NEW: White text */
+  font-size: 1.4rem; /* Prominent value */
+  font-weight: 600; /* Bolder value */
+  color: var(--text-color);
 }
 
-
-/* News Card Styling */
+/* News Card Styles */
 .newsCard {
-  /* Assumes this uses UI/Card.module.css for its base dark theme styles.
-     If its title needs to be green, and it has a .cardTitle class from Card.js: */
+  margin-top: 10px; /* Space from summary card */
 }
-/* If the Card component's title (likely an <h2>) has a class like styles.cardTitle from Card.module.css,
-   you might need to target it more specifically or ensure Card.module.css makes title green
-   if --primary-color is used there for titles.
-   Let's assume the Card component's title is targeted like this if it's inside .newsCard */
-.newsCard h2 { /* A common way to target the title if Card.js renders an H2 */
-    color: var(--primary-color) !important; /* NEW: Green news heading - !important if overridden by general h2 */
+.loadingMessage {
+  text-align: center;
+  padding: 20px;
+  color: var(--dark-gray);
 }
-/* Or, if Card.js uses a specific class for title that you can target from here: */
-/* .newsCard .specificCardTitleClassFromCardJS { 
-    color: var(--primary-color) !important;
-} */
-
-
-.newsErrorMessage {
- color: var(--danger-color);
- text-align: center;
+.errorMessage { /* General error message style */
+  color: var(--danger-color);
+  background-color: rgba(220, 53, 69, 0.05);
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(220, 53, 69, 0.1);
+  text-align: center;
 }
 
 .newsList {
@@ -135,14 +180,14 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 15px; /* Reduced gap for a tighter list */
+  gap: 20px;
 }
 
 .newsItem {
   display: flex;
   gap: 15px;
   padding-bottom: 15px;
-  border-bottom: 1px solid var(--border-color-dark-theme); /* Use dark theme border */
+  border-bottom: 1px solid var(--light-gray);
 }
 .newsItem:last-child {
   border-bottom: none;
@@ -150,51 +195,200 @@
 }
 
 .newsImage {
-  width: 80px; /* Slightly smaller image for this tighter layout */
-  height: 60px;
+  width: 120px; /* Slightly larger news image */
+  height: 80px;
   object-fit: cover;
-  border-radius: 5px;
+  border-radius: 6px;
   flex-shrink: 0;
+  background-color: var(--light-gray); /* Placeholder if image fails */
 }
 
 .newsContent {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Align text content better */
+  flex-grow: 1; /* Allows content to take up space */
 }
 
-.newsTitle { /* News article title (the link) */
-  font-size: 1rem;
-  font-weight: 500; /* Medium weight */
-  color: var(--text-color) !important;      /* NEW: White text for news titles */
+.newsTitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--secondary-color);
   text-decoration: none;
   margin-bottom: 5px;
-  line-height: 1.3;
-   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .newsTitle:hover {
-  color: var(--primary-color) !important;   /* NEW: Green on hover */
   text-decoration: underline;
 }
 
-.newsDescription { /* Sub-text for news item */
-  font-size: 0.85rem;
-  color: var(--text-secondary-dark-theme) !important; /* NEW: Lighter grey for news description */
+.newsDescription {
+  font-size: 0.9rem;
+  color: #555;
   margin-bottom: 8px;
   line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.newsSource { /* Source and date */
-  font-size: 0.75rem;
-  color: var(--text-secondary-dark-theme) !important; /* NEW: Lighter grey for source */
-  margin-top: auto;
+.newsSource {
+  font-size: 0.8rem;
+  color: var(--dark-gray);
+  margin-top: auto; /* Pushes source to bottom */
 }
+.loadingMessage {
+  text-align: center;
+  padding: 20px;
+  font-size: 1rem;
+  color: var(--dark-gray);
+}
+.errorMessage {
+  color: var(--danger-color);
+  background-color: rgba(220, 53, 69, 0.05);
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px auto; /* Center if it's a block element */
+  border: 1px solid rgba(220, 53, 69, 0.1);
+  text-align: center;
+  max-width: 90%;
+}
+/* Financial Summary Boxes Grid */
+.financialSummaryGrid {
+  display: grid;
+  /* Adjust minmax: 
+     min(160px) is a smaller minimum width for each tile.
+     1fr allows them to grow and fill the space.
+  */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px; /* Gap between tiles */
+  margin-top: 20px; /* Space above the grid */
+}
+
+/* Individual Summary Box (Tile) */
+.summaryBox {
+  background-color: #ffffff;
+  padding: 15px; /* Uniform padding */
+  border-radius: 8px;
+  display: flex; /* Using flex for icon and text alignment */
+  align-items: center; /* Vertically center icon and text block */
+  gap: 12px; /* Space between icon and text block */
+  border: 1px solid #e7eaf3; /* Lighter, subtle border */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); /* Softer shadow */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  min-height: 80px; /* Ensure a minimum height for consistency */
+}
+
+.summaryBox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.06);
+}
+
+/* Summary Icon Styling */
+.summaryIcon {
+  font-size: 1.5rem; /* Slightly smaller icon to give text more space */
+  padding: 10px;   /* Padding inside the icon circle */
+  border-radius: 50%;
+  /* Using primary color with low opacity for background for a modern look */
+  background-color: rgba(var(--primary-rgb, 76, 175, 80), 0.1); /* Assumes --primary-rgb is defined in :root */
+  color: var(--primary-color); /* Icon color will be primary */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;  /* Fixed size for the icon circle */
+  height: 42px; /* Fixed size for the icon circle */
+  flex-shrink: 0; /* Prevent icon from shrinking */
+}
+/* Example: If you don't have --primary-rgb, you can use a fixed light color */
+/* .summaryIcon { background-color: #e8f5e9; color: #4CAF50; } */
+
+
+/* Text Block within Summary Box */
+.summaryText {
+  display: flex;
+  flex-direction: column; /* Stack title and value vertically */
+  justify-content: center; /* Center text vertically within its block */
+  flex-grow: 1; /* Allow text block to take available space */
+  overflow: hidden; /* Prevent text from overflowing its container */
+}
+
+.summaryText h4 { /* Title like "TOTAL INCOME" */
+  margin: 0 0 2px 0; /* Small margin below title */
+  font-size: 0.7rem; /* Smaller, more subtle title */
+  color: #6c757d;    /* Muted grey color */
+  text-transform: uppercase;
+  font-weight: 600;
+  white-space: nowrap;      /* Prevent title from wrapping */
+  overflow: hidden;         /* Hide overflow if too long */
+  text-overflow: ellipsis;  /* Add "..." if title overflows */
+  letter-spacing: 0.5px;
+}
+
+.summaryText p { /* Value like "₹2,00,000" */
+  margin: 0;
+  font-size: 1.4rem; /* Prominent value size */
+  font-weight: 700;  /* Bold */
+  color: #2a3035;    /* Dark, readable color for numbers */
+  line-height: 1.2;
+  white-space: nowrap;      /* Try to keep value on one line */
+  overflow: hidden;         /* Hide overflow */
+  text-overflow: ellipsis;  /* Add "..." if value is extremely long (unlikely for numbers) */
+}
+
+/* Color classes to be applied to the <p> tag holding the value */
+.summaryText .greenText { /* For Net Savings if positive */
+  color: var(--success-color) !important; /* e.g., #28a745 */
+}
+.summaryText .redText { /* For Total Expenses, Net Savings if negative */
+  color: var(--danger-color) !important; /* e.g., #dc3545 */
+}
+
+/* Ensure your :root variables are defined, typically in index.css or App.css */
+/*
+:root {
+  --primary-color: #4CAF50;
+  --primary-rgb: 76, 175, 80; // Added for rgba background on icon
+  --secondary-color: #007bff;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --text-color: #333333;
+  --dark-gray: #6c757d;
+  --light-gray: #f0f0f0;
+}
+*/
+
+/* Other general styles like .loadingText, .errorMessage, .infoMessage should already exist */
+.loadingText {
+  text-align: center;
+  padding: 20px;
+  font-size: 1rem;
+  color: var(--dark-gray);
+}
+.errorMessage {
+  color: var(--danger-color);
+  background-color: rgba(220, 53, 69, 0.05);
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px auto;
+  border: 1px solid rgba(220, 53, 69, 0.1);
+  text-align: center;
+  max-width: 90%;
+}
+.infoMessage {
+  text-align: center;
+  padding: 15px;
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+/* ... (Styles for .dashboardHome, .profileSummaryCard, .profileHeader, .profilePicDashboard, .initialsFallbackDashboard, .profileInfo) ... */
+/* ... (Styles for .financialSummaryGrid, .summaryBox, .summaryIcon, .summaryText) ... */
+/* ... (Styles for .newsCard, .newsList, .newsItem, .newsImage, .newsContent, .newsTitle, .newsDescription, .newsSource) ... */

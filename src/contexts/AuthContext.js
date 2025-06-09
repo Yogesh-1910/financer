@@ -6,79 +6,69 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [token, setToken] = useState(authService.getToken()); // Initialize token from localStorage
-  const [loading, setLoading] = useState(true); // Start true for initial auth check
+  const [token, setToken] = useState(authService.getToken());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const verifyTokenAndLoadUser = async () => {
-      console.log("[AuthContext] Initializing Auth. Current token from localStorage:", token);
-      if (token) {
+      const currentToken = authService.getToken();
+      // No need to call setToken(currentToken) here, it's already initialized with it.
+      // This effect should run primarily based on component mount, not token changes from login/logout.
+      // Login/logout will directly set currentUser and token state.
+
+      if (currentToken) {
         try {
-          console.log("[AuthContext] Token found, attempting to fetch user profile...");
-          const userProfile = await authService.fetchUserProfile(); // Validates token and gets fresh user data
+          console.log("[AuthContext] Token exists, fetching user profile...");
+          const userProfile = await authService.fetchUserProfile(); // Validates token
           setCurrentUser(userProfile);
-          console.log("[AuthContext] User profile fetched and set:", userProfile);
+          setToken(currentToken); // Ensure token state is also set if userProfile fetch is successful
+          console.log("[AuthContext] User profile loaded and set:", userProfile);
         } catch (error) {
-          console.warn("[AuthContext] Failed to fetch user profile with stored token (it might be expired/invalid):", error.response?.data?.msg || error.message);
-          authService.logout(); // Clear invalid token and user from localStorage
+          console.warn("[AuthContext] Failed to validate token/fetch profile:", error.response?.data?.msg || error.message);
+          authService.logout(); // Clear bad token
           setCurrentUser(null);
-          setToken(null); // Clear token state
+          setToken(null);
         }
       } else {
-        console.log("[AuthContext] No token found in localStorage.");
-        setCurrentUser(null); // Ensure user is null if no token
+        setCurrentUser(null); // Explicitly set to null if no token
+        setToken(null);
       }
       setLoading(false);
     };
 
     verifyTokenAndLoadUser();
-  }, [token]); // Rerun if token changes (e.g., after login) - but initial load is key.
-                // For initial load, you might also just run it once: }, []); and handle token set explicitly in login/signup.
-                // The current [token] dependency means if token is set by login, this effect will run again.
+  }, []); // Run ONCE on component mount to check initial auth state
 
   const loginUser = async (credentials) => {
-    // setLoading(true); // Handled by component's local loading state
+    // Component local isLoading state handles button disabling
     try {
-      const data = await authService.login(credentials); // authService handles localStorage
+      const data = await authService.login(credentials);
       setCurrentUser(data.user);
-      setToken(data.token); // This will trigger the useEffect above if it depends on token
-      console.log("[AuthContext] Login successful, user & token set.");
-      // setLoading(false);
+      setToken(data.token); // This might trigger the useEffect if it depended on 'token'
       return data;
-    } catch (error) {
-      // setLoading(false);
-      console.error("[AuthContext] Login failed:", error.response?.data || error.message);
-      throw error; // Re-throw for the component to handle UI error display
-    }
+    } catch (error) { throw error; }
   };
 
   const signupUser = async (userData) => {
-    // setLoading(true);
     try {
-      const data = await authService.signup(userData); // authService handles localStorage
+      const data = await authService.signup(userData);
       setCurrentUser(data.user);
       setToken(data.token);
-      console.log("[AuthContext] Signup successful, user & token set.");
-      // setLoading(false);
       return data;
-    } catch (error) {
-      // setLoading(false);
-      console.error("[AuthContext] Signup failed:", error.response?.data || error.message);
-      throw error;
-    }
+    } catch (error) { throw error; }
   };
 
   const logoutUser = () => {
-    console.log("[AuthContext] Logging out user.");
-    authService.logout(); // authService handles localStorage
+    authService.logout();
     setCurrentUser(null);
     setToken(null);
   };
 
   const updateUserContext = (updatedUserDataFromBackend) => {
-    console.log("[AuthContext] Updating user context with:", updatedUserDataFromBackend);
-    // authService.updateUserProfile would have already updated localStorage
+    console.log("[AuthContext] Context updated with user data:", updatedUserDataFromBackend);
     setCurrentUser(updatedUserDataFromBackend);
+    // Token usually doesn't change on profile update, so no need to setToken here
+    // authService methods already updated localStorage
   };
 
   const value = {
@@ -89,11 +79,9 @@ export const AuthProvider = ({ children }) => {
     logout: logoutUser,
     updateUserContext,
     isAuthenticated: !!token && !!currentUser,
-    loading, // Global loading state for initial auth check
+    loading,
   };
 
-  // Render children only after initial loading is complete
-  // Or show a global loading spinner here based on `loading`
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

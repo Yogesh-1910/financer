@@ -79,3 +79,132 @@
   /* No transition needed here if parent hover handles it or if color doesn't change */
 }
 /* UserAvatar styling comes from UserAvatar.module.css */
+
+/* src/components/Layout/Navbar.module.css */
+/* ... (Keep your existing navbar, navLeft, brand, menuButton styles) ... */
+
+.navRight {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Good for spacing items in the right section */
+}
+
+.welcomeMessage {
+    font-size: 0.95rem;
+    color: white; /* Assuming navbar has dark background */
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+.navProfileLink {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Ensures content is centered if dimensions fixed */
+    text-decoration: none;
+    width: 32px;  /* Container size for pic/initials */
+    height: 32px; /* Container size for pic/initials */
+    border-radius: 50%; /* Makes the container circular */
+    overflow: hidden; /* Clips content to the circle */
+    background-color: var(--light-gray); /* Fallback background */
+    border: 1px solid rgba(255,255,255,0.7); /* Subtle border */
+    cursor: pointer;
+}
+.navProfileLink:hover {
+    opacity: 0.9;
+}
+
+
+.navProfilePic {
+    width: 100%;  /* Fill the parent .navProfileLink */
+    height: 100%; /* Fill the parent .navProfileLink */
+    object-fit: cover;   /* Scale and crop to fill */
+    object-position: center;
+}
+
+.navProfileInitial {
+    width: 100%;  /* Fill the parent .navProfileLink */
+    height: 100%; /* Fill the parent .navProfileLink */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem; /* Adjust to fit nicely in 32px circle */
+    color: white;
+    background-color: var(--secondary-color); /* Or a distinct color */
+    /* border-radius already on .navProfileLink */
+}
+
+.logoutButton {
+    padding: 7px 12px; /* Slightly smaller logout button */
+    font-size: 0.85rem;
+}
+
+/* Styles for login/signup links if needed */
+.navLink button {
+  font-size: 0.9rem;
+  padding: 8px 15px;
+}
+.navLink:not(:last-child) {
+    margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+    .welcomeMessage {
+        display: none;
+    }
+}
+/* src/components/Layout/Navbar.module.css */
+/* ... your existing styles ... */
+
+.navRight {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.welcomeMessage {
+    font-size: 0.95rem;
+    color: white;
+    white-space: nowrap;
+}
+
+.navProfileLink {
+    display: flex; /* Helps if content inside needs centering */
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden; /* Crucial for circular images and object-fit */
+    background-color: var(--light-gray); /* Fallback background for the circle */
+    border: 1px solid rgba(255,255,255,0.7); /* Optional border */
+    text-decoration: none; /* Remove underline from link */
+    cursor: pointer;
+}
+.navProfileLink:hover {
+    opacity: 0.9;
+}
+
+.navProfilePic {
+    width: 100%;  /* Image fills its circular container */
+    height: 100%; /* Image fills its circular container */
+    object-fit: cover;   /* Scale image to cover, crop if needed */
+    object-position: center; /* Center the image within the crop */
+}
+
+.navProfileInitial {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem; /* Adjust for visibility */
+    color: white;
+    background-color: var(--secondary-color); /* Or another distinct color */
+    /* border-radius is on the parent .navProfileLink */
+}
+
+.logoutButton { /* Ensure styles are appropriate */
+    padding: 7px 12px;
+    font-size: 0.85rem;
+}

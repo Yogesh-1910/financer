@@ -4,7 +4,7 @@ import { Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom';
 import Navbar from '../components/Layout/Navbar';
 import Sidebar from '../components/Layout/Sidebar';
 
-// Ensure this path is correct and the file exports these constants
+// Assuming these are defined in ../utils/eventTypes.js
 import { USER_DATA_UPDATED_EVENT, BUDGET_ITEMS_UPDATED_EVENT, FINANCIAL_ENTITIES_UPDATED_EVENT } from '../utils/eventTypes';
 
 import BudgetExcelView from '../components/Dashboard/BudgetExcelView';
@@ -14,14 +14,13 @@ import StockMonitor from '../components/Dashboard/StockMonitor';
 import ProfileManager from '../components/Dashboard/ProfileManager';
 import Card from '../components/UI/Card';
 import { useAuth } from '../contexts/AuthContext';
-import { getFinanceNews } from '../api/newsService';   // FROM THE SIMPLIFIED/DEBUG VERSION
+import { getFinanceNews } from '../api/newsService';
 import budgetService from '../api/budgetService';
 import loanService from '../api/loanService';
-// import emiService from '../api/emiService'; // Uncomment if used for summary
-import md5 from 'md5'; // For Gravatar-like profile pic fallback
-import styles from './DashboardPage.module.css';   // Your CSS module
+// import emiService from '../api/emiService';
+import md5 from 'md5';
+import styles from './DashboardPage.module.css';
 
-// --- Helper to format currency ---
 const formatCurrency = (amount, currency = 'INR') => {
   const numericAmount = Number(amount);
   if (isNaN(numericAmount)) {
@@ -30,51 +29,40 @@ const formatCurrency = (amount, currency = 'INR') => {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(numericAmount);
 };
 
-// --- Constants for Image URLs ---
 const API_BASE_URL_ENV_DASH = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 const IMAGE_SERVER_URL_DASH = API_BASE_URL_ENV_DASH.endsWith('/api')
-                           ? API_BASE_URL_ENV_DASH.substring(0, API_BASE_URL_ENV_DASH.length - '/api'.length)
-                           : API_BASE_URL_ENV_DASH;
+    ? API_BASE_URL_ENV_DASH.substring(0, API_BASE_URL_ENV_DASH.length - '/api'.length)
+    : API_BASE_URL_ENV_DASH; // CORRECTED TYPO HERE
 const DEFAULT_DASH_PROFILE_PIC = "https://via.placeholder.com/80.png?text=User";
 
-
-// --- DASHBOARD HOME COMPONENT ---
 const DashboardHome = () => {
-  const { currentUser, loading: authIsLoading } = useAuth();
+  const { currentUser, loading: authIsLoading } = useAuth(); // CORRECTLY DESTRUCTURED HERE
   const location = useLocation();
 
-  console.log("[DashboardHome] Rendering. currentUser from context:", currentUser, "Auth loading:", authIsLoading);
-
-  // News State
   const [newsArticles, setNewsArticles] = useState([]);
   const [newsLoading, setNewsLoading] = useState(true);
   const [newsError, setNewsError] = useState(null);
 
-  // Summary State
   const [summaryData, setSummaryData] = useState({
-    totalIncome: 0, totalExpenses: 0, netSavings: 0, totalLoanPayments: 0, investmentAmount: 0,
+    salary: 0, totalExpenses: 0, netSavings: 0, totalLoanPayments: 0, investmentAmount: 0,
   });
   const [summaryCalculating, setSummaryCalculating] = useState(true);
   const [summaryFetchError, setSummaryFetchError] = useState(null);
 
-  // State for fetched data used in summary calculation
   const [dbBudgetItems, setDbBudgetItems] = useState([]);
   const [dbLoans, setDbLoans] = useState([]);
 
   const salaryStorageKey = useMemo(() => currentUser?.id ? `financeAppUserSalary_${currentUser.id}` : null, [currentUser]);
 
-  // Combined data fetching and summary calculation
   const fetchAndCalculateSummary = useCallback(async () => {
     if (!currentUser?.id) {
-      console.log("[DashboardHome] fetchAndCalculateSummary: No current user ID, resetting summary.");
-      setSummaryData({ totalIncome: 0, totalExpenses: 0, netSavings: 0, totalLoanPayments: 0, investmentAmount: 0 });
+      setSummaryData({ salary: 0, totalExpenses: 0, netSavings: 0, totalLoanPayments: 0, investmentAmount: 0 });
       setDbBudgetItems([]);
       setDbLoans([]);
       setSummaryCalculating(false);
       return;
     }
 
-    console.log("[DashboardHome] fetchAndCalculateSummary: Starting data fetch for user ID:", currentUser.id);
     setSummaryCalculating(true);
     setSummaryFetchError(null);
 
@@ -84,13 +72,12 @@ const DashboardHome = () => {
     try {
       const [budgetItemsResponse, loansResponse] = await Promise.all([
         budgetService.getBudgetItems().catch(err => {
-            console.error("[DashboardHome] fetchAndCalculateSummary: Error fetching budget items:", err.response?.data || err.message);
+            console.error("[DashboardHome] fetchAndCalc: Error fetching budget items:", err.response?.data || err.message);
             setSummaryFetchError(prevErr => prevErr ? `${prevErr}, Budget fetch failed.` : "Failed to load budget data.");
             return [];
         }),
         loanService.getLoans().catch(err => {
-            console.error("[DashboardHome] fetchAndCalculateSummary: Error fetching loans:", err.response?.data || err.message);
-            setSummaryFetchError(prevErr => prevErr ? `${prevErr}, Loan fetch failed.` : "Failed to load loan data.");
+            console.error("[DashboardHome] fetchAndCalc: Error fetching loans:", err.response?.data || err.message);
             return [];
         }),
       ]);
@@ -101,16 +88,13 @@ const DashboardHome = () => {
       setDbBudgetItems(fetchedBudgetItems);
       setDbLoans(fetchedLoans);
 
-      console.log("[DashboardHome] fetchAndCalculateSummary: Data fetched. BudgetItems:", fetchedBudgetItems.length, "Loans:", fetchedLoans.length);
-
       const manuallySetSalaryFallback = parseFloat(localStorage.getItem(salaryStorageKey)) || 0;
-      if (manuallySetSalaryFallback > 0) {
-          console.log("[DashboardHome] fetchAndCalculateSummary: Salary from localStorage fallback (if needed):", manuallySetSalaryFallback);
-      }
 
       const getNumericAmount = (item, field = 'plannedAmount') => parseFloat(item?.[field]) || 0;
+
       const dbSalaryItem = fetchedBudgetItems.find(item => item.type === 'income' && item.category?.toLowerCase() === 'salary');
       let primarySalary = getNumericAmount(dbSalaryItem);
+
       if (primarySalary === 0 && manuallySetSalaryFallback > 0 && !dbSalaryItem) {
           primarySalary = manuallySetSalaryFallback;
       }
@@ -138,15 +122,18 @@ const DashboardHome = () => {
       }, 0);
 
       const calculatedNetSavings = calculatedTotalIncome - calculatedTotalExpenses;
+
       const newSummary = {
-        salary: calculatedTotalIncome, totalExpenses: calculatedTotalExpenses, netSavings: calculatedNetSavings,
-        totalLoanPayments: calculatedLoanPayments, investmentAmount: calculatedInvestmentAmount,
+        salary: calculatedTotalIncome,
+        totalExpenses: calculatedTotalExpenses,
+        netSavings: calculatedNetSavings,
+        totalLoanPayments: calculatedLoanPayments,
+        investmentAmount: calculatedInvestmentAmount,
       };
-      console.log("[DashboardHome] fetchAndCalculateSummary: New summary calculated:", newSummary);
       setSummaryData(newSummary);
 
     } catch (error) {
-      console.error("[DashboardHome] fetchAndCalculateSummary: Overall critical error:", error);
+      console.error("[DashboardHome] fetchAndCalc: Overall critical error:", error);
       const criticalErrorMsg = error.message || "A critical error occurred while generating the summary.";
       setSummaryFetchError(prevErr => prevErr ? `${prevErr}, ${criticalErrorMsg}`: criticalErrorMsg);
       setSummaryData({ salary: 0, totalExpenses: 0, netSavings: 0, totalLoanPayments: 0, investmentAmount: 0 });
@@ -155,56 +142,48 @@ const DashboardHome = () => {
   }, [currentUser, salaryStorageKey]);
 
   useEffect(() => {
-    if (currentUser?.id && !authIsLoading) {
+    if (currentUser?.id && !authIsLoading) { // USE authIsLoading HERE
       fetchAndCalculateSummary();
     }
+
     const handleDataUpdate = (event) => {
-      console.log(`[DashboardHome] EventListener: Received ${event.type}. Re-fetching summary.`);
-      if (currentUser?.id) { fetchAndCalculateSummary(); }
+      if (currentUser?.id) {
+        fetchAndCalculateSummary();
+      }
     };
-    console.log("[DashboardHome] Adding event listeners for data updates.");
+
     window.addEventListener(USER_DATA_UPDATED_EVENT, handleDataUpdate);
     window.addEventListener(BUDGET_ITEMS_UPDATED_EVENT, handleDataUpdate);
     window.addEventListener(FINANCIAL_ENTITIES_UPDATED_EVENT, handleDataUpdate);
+
     return () => {
-      console.log("[DashboardHome] Removing event listeners.");
       window.removeEventListener(USER_DATA_UPDATED_EVENT, handleDataUpdate);
       window.removeEventListener(BUDGET_ITEMS_UPDATED_EVENT, handleDataUpdate);
       window.removeEventListener(FINANCIAL_ENTITIES_UPDATED_EVENT, handleDataUpdate);
     };
-  }, [currentUser, authIsLoading, fetchAndCalculateSummary]);
+  }, [currentUser, authIsLoading, fetchAndCalculateSummary]); // USE authIsLoading HERE
 
-  // --- SIMPLIFIED News fetching useEffect (from previous focused response) ---
   useEffect(() => {
-    console.log("[DashboardHome] NewsEffect: Mounting. Attempting to fetch news.");
-    setNewsLoading(true);
-    setNewsError(null);
-    setNewsArticles([]); // Clear previous articles
+    const newsApiKey = process.env.REACT_APP_NEWS_API_KEY;
+    const shouldFetchNews = newsApiKey && newsApiKey !== 'YOUR_NEWS_API_KEY' && newsApiKey !== 'YOUR_API_KEY';
+    if (shouldFetchNews) {
+        const fetchNews = async () => {
+            setNewsLoading(true); setNewsError(null);
+            try {
+                const articles = await getFinanceNews();
+                setNewsArticles(Array.isArray(articles) ? articles : []);
+            } catch (error) {
+                setNewsError(error.message || "Could not load news articles.");
+                setNewsArticles([]);
+            }
+            setNewsLoading(false);
+        };
+        fetchNews();
+    } else {
+        setNewsLoading(false); setNewsArticles([]);
+    }
+  }, []);
 
-    getFinanceNews() // This uses the newsService.js with extensive logging
-      .then(data => {
-        console.log("[DashboardHome] NewsEffect: getFinanceNews() PROMISE RESOLVED. Data:", data);
-        if (Array.isArray(data)) {
-          setNewsArticles(data);
-        } else {
-          console.error("[DashboardHome] NewsEffect: Data from getFinanceNews is not an array:", data);
-          setNewsError("Received unexpected data format for news.");
-          setNewsArticles([]); // Ensure empty array on format error
-        }
-      })
-      .catch(err => {
-        console.error("[DashboardHome] NewsEffect: getFinanceNews() PROMISE REJECTED. Error object:", err);
-        setNewsError(err.message || "Failed to load news. Check console for details from NewsService.");
-        setNewsArticles([]); // Ensure empty array on error
-      })
-      .finally(() => {
-        setNewsLoading(false);
-        console.log("[DashboardHome] NewsEffect: Fetch attempt complete. Loading set to false.");
-      });
-  }, []); // Empty dependency array - fetch news once on mount
-
-
-  // Profile Pic Logic
   const getProfilePicUrl = () => {
     if (currentUser?.profilePicUrl) {
       return `${IMAGE_SERVER_URL_DASH}${currentUser.profilePicUrl}?t=${new Date().getTime()}`;
@@ -216,7 +195,7 @@ const DashboardHome = () => {
     return DEFAULT_DASH_PROFILE_PIC;
   };
 
-  if (authIsLoading && !currentUser) {
+  if (authIsLoading && !currentUser) { // USE authIsLoading HERE
     return <Card title="Dashboard"><p className={styles.loadingText}>Initializing user session...</p></Card>;
   }
   if (!currentUser) {
@@ -233,23 +212,22 @@ const DashboardHome = () => {
             <p>Here's a quick overview of your finances.</p>
           </div>
         </div>
-
         {summaryCalculating && <p className={styles.loadingText}>Calculating financial summary...</p>}
-        {summaryFetchError && <p className={styles.errorMessage}>Summary Error: {summaryFetchError}</p>}
+        {summaryFetchError && <p className={styles.errorMessage}>{summaryFetchError}</p>}
         {!summaryCalculating && !summaryFetchError && (
           <div className={styles.financialSummaryGrid}>
             <SummaryBox title="Total Income" value={formatCurrency(summaryData.salary)} icon="💵" />
             <SummaryBox title="Total Expenses" value={formatCurrency(summaryData.totalExpenses)} icon="💸" colorStyle="redText" />
             <SummaryBox title="Net Savings" value={formatCurrency(summaryData.netSavings)} icon="💰" colorStyle={summaryData.netSavings >= 0 ? "greenText" : "redText"} />
             <SummaryBox title="Loan/EMI Payments" value={formatCurrency(summaryData.totalLoanPayments)} icon="💳" />
-           
+            <SummaryBox title="Investments Outflow" value={formatCurrency(summaryData.investmentAmount)} icon="📈" />
           </div>
         )}
       </Card>
 
       <Card title="Latest Finance News" className={styles.newsCard}>
-        {newsLoading && <p className={styles.loadingText}>Loading news articles...</p>}
-        {!newsLoading && newsError && <p className={styles.errorMessage}>News Update Error: {newsError}</p>}
+        {newsLoading && <p className={styles.loadingText}>Loading news...</p>}
+        {newsError && <p className={styles.errorMessage}>News Update: {newsError}</p>}
         {!newsLoading && !newsError && newsArticles.length > 0 && (
           <ul className={styles.newsList}>
             {newsArticles.map((article, index) => (
@@ -272,64 +250,52 @@ const DashboardHome = () => {
   );
 };
 
-// SummaryBox helper component
 const SummaryBox = ({ title, value, icon, colorStyle }) => (
   <div className={`${styles.summaryBox} ${colorStyle ? styles[colorStyle] : ''}`}>
     <span className={styles.summaryIcon}>{icon}</span>
     <div className={styles.summaryText}>
       <h4>{title}</h4>
-      <p className={styles[colorStyle] || ''}>{value}</p> {/* Apply colorStyle to value */}
+      <p className={styles[colorStyle] || ''}>{value}</p>
     </div>
   </div>
 );
 
-// --- Main DashboardPage Layout Component ---
 export const DashboardPage = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
-        setIsSidebarOpen(true);
-      } else {
-        setIsSidebarOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize();
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const mainContentMarginClass = 
-    (window.innerWidth > 768 && isSidebarOpen) ? styles.mainContentOpen :
-    (window.innerWidth > 768 && !isSidebarOpen) ? styles.mainContentCollapsed : 
-    '';
-
-  return (
-    <div className={styles.dashboardPageLayout}>
-      <Navbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      <div className={styles.dashboardContainer}>
-        <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        <main className={`${styles.mainDashboardContent} ${mainContentMarginClass}`}>
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  );
+    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 768) setIsSidebarOpen(true);
+            else setIsSidebarOpen(false);
+        };
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+    const mainContentMarginClass = (window.innerWidth > 768 && isSidebarOpen) ? styles.mainContentOpen :
+        (window.innerWidth > 768 && !isSidebarOpen) ? styles.mainContentCollapsed : '';
+    return (
+        <div className={styles.dashboardPageLayout}>
+            <Navbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+            <div className={styles.dashboardContainer}> {/* Changed from app-container */}
+                <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+                <main className={`${styles.mainDashboardContent} ${mainContentMarginClass}`}><Outlet /></main>
+            </div>
+        </div>
+    );
 };
 
-// --- DashboardRoutes ---
 export const DashboardRoutes = () => (
-  <Routes>
-    <Route path="/" element={<DashboardPage />}>
-      <Route index element={<DashboardHome />} />
-      <Route path="budget" element={<BudgetExcelView />} />
-      <Route path="loans-emi" element={<LoanEMITracker />} />
-      <Route path="stocks" element={<StockMonitor />} />
-      <Route path="ai-assistant" element={<AIAssistant />} />
-      <Route path="profile" element={<ProfileManager />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Route>
-  </Routes>
+    <Routes>
+        <Route path="/" element={<DashboardPage />}>
+            <Route index element={<DashboardHome />} />
+            <Route path="budget" element={<BudgetExcelView />} />
+            <Route path="loans-emi" element={<LoanEMITracker />} />
+            <Route path="stocks" element={<StockMonitor />} />
+            <Route path="ai-assistant" element={<AIAssistant />} />
+            <Route path="profile" element={<ProfileManager />} />
+            {/* Fallback for unknown /dashboard sub-routes */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Route>
+    </Routes>
 );

@@ -40,7 +40,11 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
       allowNull: false, // CRITICAL
-    }
+    },
+     profilePicUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+     }
   }, {
     sequelize,
     modelName: 'User',

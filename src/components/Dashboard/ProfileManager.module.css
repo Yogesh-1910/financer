@@ -1,52 +1,115 @@
-.profileForm {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px; /* Increased gap between input groups for better spacing */
-}
-
-/* The Input component's wrapper div (from UI/Input.js) */
-/* No specific styles needed here if Input.module.css handles individual input group margin */
-.profileForm .inputGroup {
-    margin-bottom: 12px; /* Consistent spacing */
-}
-
-/* --- Styles for DISPLAY MODE (when isEditing is false) --- */
-/* If you are using the ProfileManager.js version that has a separate .profileDisplay div
-   and uses spans for display, you'd style .profileDisplay, .displayField, etc. here.
-   However, if you are using the version where <Input> components are simply disabled
-   when not editing, then their appearance will be controlled by the :disabled state
-   in Input.module.css.
-*/
-.profileDisplay { /* This class is used if you conditionally render text spans */
+/* src/components/Dashboard/ProfileManager.module.css */
+.profileLayout {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 25px;
 }
+
+@media (min-width: 768px) {
+    .profileLayout {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+.profilePictureArea {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%; /* Full width on mobile for centering image */
+}
+
+@media (min-width: 768px) {
+     .profilePictureArea {
+         margin-bottom: 0;
+         margin-right: 30px; /* Space between pic area and form area */
+         width: 150px; /* Container width for the image and button below it */
+         align-items: center; /* Keep content centered if this container is wider */
+     }
+}
+
+.profileImageEditPage {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;   /* This is key */
+    object-position: center; /* Ensures the center of the image is prioritized */
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    background-color: var(--light-gray); /* Fallback color */
+    display: block; /* Remove extra space below image */
+    /* margin-left: auto; Remove auto margins if parent .profilePictureArea handles centering */
+    /* margin-right: auto; */
+}
+
+.fileInputContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%; /* Takes width of its parent (.profilePictureArea) */
+    margin-top: 10px; /* Space from image */
+}
+
+.fileInputContainer Button { /* Target our custom Button component */
+    padding: 8px 15px;
+    font-size: 0.85rem;
+}
+
+.fileInputHidden {
+    display: none;
+}
+
+.fileErrorMessage {
+    color: var(--danger-color);
+    font-size: 0.8rem;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.profileFormArea {
+    flex-grow: 1; /* Takes remaining space on larger screens */
+    width: 100%; /* Full width on smaller screens */
+}
+
+/* Form and Display specific styles */
+.profileForm .inputGroup, /* Assuming Input component wraps itself in .inputGroup */
+.displayField {
+    margin-bottom: 15px !important; /* Consistent spacing */
+}
+
+.profileForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0px; /* Input groups will have their own margin */
+}
+
 .displayField {
     display: flex;
     flex-direction: column;
-    padding-bottom: 8px; /* Add some padding or a border if you like */
-    /* border-bottom: 1px solid var(--border-color-dark-theme); */
+    gap: 4px; /* Space between label and value */
 }
+
 .displayLabel {
-    font-weight: 500;
-    color: var(--text-secondary-dark-theme);
-    font-size: 0.85rem;
-    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--dark-gray);
+    font-size: 0.9rem;
 }
-.displayValue { /* This is for the <span> version if not using disabled inputs */
-    font-size: 0.95rem;
+
+.displayValue {
+    font-size: 1rem;
     color: var(--text-color);
-    padding: 10px 12px; /* Match input padding */
-    background-color: #000000; /* Black background */
-    border: 2px solid var(--primary-color); /* Green border */
-    border-radius: 6px;
-    min-height: calc(0.95rem + 20px + 4px); /* Approx height of input */
-    word-break: break-word;
+    padding: 10px;
+    background-color: #f0f2f5; /* Slightly different from input bg for readonly feel */
+    border: 1px solid #dfe3e7;
+    border-radius: 5px;
+    min-height: 21px; /* Approximate height of an input field's text area */
+    word-break: break-word; /* Prevent long strings from breaking layout */
 }
 
-
-/* Message Styling (Success/Error) */
+/* Message and ButtonGroup styles (should be mostly from previous versions) */
 .message {
   padding: 10px 15px;
   border-radius: 4px;
@@ -55,20 +118,22 @@
   text-align: center;
 }
 .successMessage {
-  color: var(--success-color); /* Green text */
-  background-color: rgba(var(--success-rgb, 0, 179, 134), 0.15); /* Light green background (assuming --success-rgb) */
-  border: 1px solid rgba(var(--success-rgb, 0, 179, 134), 0.3);
+  color: var(--success-color);
+  background-color: rgba(40,167,69,0.1);
+  border: 1px solid rgba(40,167,69,0.2);
 }
 .errorMessage {
-  color: var(--danger-color); /* Red text */
-  background-color: rgba(var(--danger-rgb, 255, 82, 82), 0.15); /* Light red background (assuming --danger-rgb) */
-  border: 1px solid rgba(var(--danger-rgb, 255, 82, 82), 0.3);
+  color: var(--danger-color);
+  background-color: rgba(220,53,69,0.1);
+  border: 1px solid rgba(220,53,69,0.2);
 }
 
-/* Button Group Styling */
 .buttonGroup {
   display: flex;
   gap: 15px;
-  margin-top: 25px; /* More space above buttons */
+  margin-top: 20px;
   justify-content: flex-start;
+}
+.buttonGroup button {
+  padding: 10px 20px;
 }
